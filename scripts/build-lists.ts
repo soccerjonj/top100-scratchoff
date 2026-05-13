@@ -142,15 +142,25 @@ async function buildImdb(): Promise<void> {
   console.log(`Wrote ${out.length} entries → ${file}`);
 }
 
-// ---------- Letterboxd Top 500 (slug-first) ----------
+// ---------- Slug-first lists (Letterboxd list URL → JSON) ----------
 
-const LB_LIST_URL =
-  "https://letterboxd.com/official/list/letterboxds-top-500-films";
+const SLUG_FIRST_LISTS: Record<string, { url: string; outFile: string; label: string }> = {
+  letterboxd: {
+    url: "https://letterboxd.com/official/list/letterboxds-top-500-films",
+    outFile: "letterboxd-top-500.json",
+    label: "lb",
+  },
+  nyt: {
+    url: "https://letterboxd.com/kastranec/list/nyt-100-best-movie-of-the-21st-century",
+    outFile: "nyt-top-100.json",
+    label: "nyt",
+  },
+};
 
-async function scrapeTopListSlugs(): Promise<string[]> {
+async function scrapeListSlugs(listUrl: string, label: string): Promise<string[]> {
   const all: string[] = [];
   for (let page = 1; page <= 10; page++) {
-    const url = page === 1 ? `${LB_LIST_URL}/` : `${LB_LIST_URL}/page/${page}/`;
+    const url = page === 1 ? `${listUrl}/` : `${listUrl}/page/${page}/`;
     const html = await fetchHtml(url);
     if (!html) break;
     const root = parse(html);
@@ -163,11 +173,10 @@ async function scrapeTopListSlugs(): Promise<string[]> {
     }
     if (pageSlugs.length === 0) break;
     all.push(...pageSlugs);
-    console.log(`[lb] page ${page}: +${pageSlugs.length} (total ${all.length})`);
+    console.log(`[${label}] page ${page}: +${pageSlugs.length} (total ${all.length})`);
     if (pageSlugs.length < 100) break;
     await sleep(500);
   }
-  // De-dupe but preserve order
   return Array.from(new Set(all));
 }
 
@@ -178,10 +187,11 @@ async function tmdbIdForFilm(slug: string): Promise<number | null> {
   return m ? Number(m[1]) : null;
 }
 
-async function buildLetterboxd(): Promise<void> {
-  const slugs = await scrapeTopListSlugs();
+async function buildSlugFirstList(key: keyof typeof SLUG_FIRST_LISTS): Promise<void> {
+  const { url, outFile, label } = SLUG_FIRST_LISTS[key];
+  const slugs = await scrapeListSlugs(url, label);
   if (slugs.length === 0) {
-    console.warn("[lb] no slugs collected, aborting");
+    console.warn(`[${label}] no slugs collected, aborting`);
     return;
   }
   const out: FilmEntry[] = [];
@@ -204,10 +214,10 @@ async function buildLetterboxd(): Promise<void> {
     }
     out.push({ rank, title, year, tmdbId, posterPath, letterboxdSlug: slug });
     console.log(
-      `#${rank.toString().padStart(3)}  ${slug} → tmdb:${tmdbId ?? "MISS"}  ${title} (${year || "?"})`,
+      `[${label}] #${rank.toString().padStart(3)}  ${slug} → tmdb:${tmdbId ?? "MISS"}  ${title} (${year || "?"})`,
     );
   }
-  const file = path.join(DATA_DIR, "letterboxd-top-500.json");
+  const file = path.join(DATA_DIR, outFile);
   await fs.writeFile(file, JSON.stringify(out, null, 2));
   console.log(`Wrote ${out.length} entries → ${file}`);
 }
@@ -219,11 +229,17 @@ async function main() {
   await fs.mkdir(DATA_DIR, { recursive: true });
 
   const args = process.argv.slice(2);
-  const wantLb = args.includes("--letterboxd") || args.includes("--all");
-  const wantImdb = args.includes("--imdb") || args.includes("--all") || (!wantLb && args.length === 0);
+  const wantAll = args.includes("--all");
+  const wantLb = wantAll || args.includes("--letterboxd");
+  const wantNyt = wantAll || args.includes("--nyt");
+  const wantImdb =
+    wantAll ||
+    args.includes("--imdb") ||
+    (!wantLb && !wantNyt && args.length === 0);
 
   if (wantImdb) await buildImdb();
-  if (wantLb) await buildLetterboxd();
+  if (wantLb) await buildSlugFirstList("letterboxd");
+  if (wantNyt) await buildSlugFirstList("nyt");
 }
 
 main().catch((e) => {

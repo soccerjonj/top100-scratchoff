@@ -40,10 +40,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "could not read file" }, { status: 400 });
   }
 
-  const lookup = buildListLookup([
-    LISTS["imdb-top-100"].entries,
-    LISTS["letterboxd-top-500"].entries,
-  ]);
+  const lookup = buildListLookup(
+    Object.values(LISTS).map((l) => l.entries),
+  );
 
   let parsed;
   try {

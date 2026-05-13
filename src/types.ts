@@ -1,4 +1,7 @@
-export type ListId = "imdb-top-100" | "letterboxd-top-500";
+export type ListId =
+  | "imdb-top-100"
+  | "letterboxd-top-500"
+  | "nyt-top-100";
 
 export interface FilmEntry {
   rank: number;

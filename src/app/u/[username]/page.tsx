@@ -13,7 +13,9 @@ type SearchParams = Promise<{ list?: string }>;
 type Params = Promise<{ username: string }>;
 
 function isListId(v: string | undefined): v is ListId {
-  return v === "imdb-top-100" || v === "letterboxd-top-500";
+  return (
+    v === "imdb-top-100" || v === "letterboxd-top-500" || v === "nyt-top-100"
+  );
 }
 
 export default async function UserPage({

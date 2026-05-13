@@ -13,7 +13,9 @@ type SearchParams = Promise<{ list?: string; mode?: string }>;
 type Params = Promise<{ users: string[] }>;
 
 function isListId(v: string | undefined): v is ListId {
-  return v === "imdb-top-100" || v === "letterboxd-top-500";
+  return (
+    v === "imdb-top-100" || v === "letterboxd-top-500" || v === "nyt-top-100"
+  );
 }
 function isMode(v: string | undefined): v is Mode {
   return v === "both" || v === "either";
