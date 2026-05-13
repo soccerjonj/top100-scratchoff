@@ -233,8 +233,10 @@ function Grid({
               position: "relative",
               overflow: "hidden",
               background: "#111",
+              transform: watched ? "scale(1.07)" : "scale(1)",
+              zIndex: watched ? 1 : 0,
               boxShadow: watched
-                ? "inset 0 0 0 2px #d4af37, 0 0 14px rgba(212,175,55,0.55)"
+                ? "inset 0 0 0 2px #d4af37, 0 0 18px rgba(212,175,55,0.6)"
                 : "inset 0 0 0 1px rgba(255,255,255,0.04)",
             }}
           >
