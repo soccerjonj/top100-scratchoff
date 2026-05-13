@@ -2,20 +2,24 @@ import { LISTS } from "@/lib/lists";
 import type { ListId } from "@/types";
 import { ListTabs } from "./ListTabs";
 import { ProgressBar } from "./ProgressBar";
-import { PosterGrid } from "./PosterGrid";
+import { PosterGrid, type Density } from "./PosterGrid";
+import { DensityToggle } from "./DensityToggle";
 
 export function ListView({
   activeList,
   watchedSlugs,
   username,
   basePath,
+  density = "comfy",
+  extraParams = {},
 }: {
   activeList: ListId;
   watchedSlugs: string[];
-  /** Username (or "userA/userB" for /together/). Only used as a fallback key. */
   username: string;
-  /** Base URL for list-tab links. Defaults to /u/{username}. */
   basePath?: string;
+  density?: Density;
+  /** Extra search params to preserve on tab/toggle links (e.g. mode= on /together). */
+  extraParams?: Record<string, string>;
 }) {
   const list = LISTS[activeList];
   const watchedSet = new Set(watchedSlugs);
@@ -26,9 +30,23 @@ export function ListView({
 
   return (
     <div className="flex flex-col gap-5">
-      <ListTabs active={activeList} basePath={tabsBase} />
-      <ProgressBar watched={watchedInList} total={list.entries.length} />
-      <PosterGrid entries={list.entries} watchedSet={watchedSet} />
+      <ListTabs active={activeList} basePath={tabsBase} extraParams={{ ...extraParams, ...(density === "dense" ? { density } : {}) }} />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex-1 min-w-[240px]">
+          <ProgressBar watched={watchedInList} total={list.entries.length} />
+        </div>
+        <DensityToggle
+          density={density}
+          basePath={tabsBase}
+          activeList={activeList}
+          extraParams={extraParams}
+        />
+      </div>
+      <PosterGrid
+        entries={list.entries}
+        watchedSet={watchedSet}
+        density={density}
+      />
     </div>
   );
 }

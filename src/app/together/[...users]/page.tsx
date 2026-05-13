@@ -4,12 +4,13 @@ import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListView } from "@/components/ListView";
 import type { ListId, UserRecord } from "@/types";
+import type { Density } from "@/components/PosterGrid";
 
 export const dynamic = "force-dynamic";
 
 type Mode = "both" | "either";
 
-type SearchParams = Promise<{ list?: string; mode?: string }>;
+type SearchParams = Promise<{ list?: string; mode?: string; density?: string }>;
 type Params = Promise<{ users: string[] }>;
 
 function isListId(v: string | undefined): v is ListId {
@@ -43,7 +44,7 @@ export default async function TogetherPage({
   searchParams: SearchParams;
 }) {
   const { users: rawUsers } = await params;
-  const { list, mode: rawMode } = await searchParams;
+  const { list, mode: rawMode, density: rawDensity } = await searchParams;
 
   const usernames = Array.from(
     new Set(rawUsers.map(normalizeUsername).filter(Boolean)),
@@ -55,6 +56,7 @@ export default async function TogetherPage({
 
   const activeList: ListId = isListId(list) ? list : "imdb-top-100";
   const mode: Mode = isMode(rawMode) ? rawMode : "both";
+  const density: Density = rawDensity === "dense" ? "dense" : "comfy";
 
   const records: UserRecord[] = [];
   for (const u of usernames) {
@@ -73,7 +75,7 @@ export default async function TogetherPage({
   const base = `/together/${usernames.join("/")}`;
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
+    <main className="mx-auto max-w-[1800px] px-4 py-8">
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
@@ -105,30 +107,28 @@ export default async function TogetherPage({
       </header>
 
       <nav className="mb-4 flex flex-wrap gap-2">
-        <Link
-          href={`${base}?mode=both${list ? `&list=${list}` : ""}`}
-          scroll={false}
-          className={[
-            "rounded-full border px-3 py-1 text-xs transition",
-            mode === "both"
-              ? "border-gold bg-gold/10 text-gold"
-              : "border-zinc-700 text-zinc-400 hover:border-gold/50",
-          ].join(" ")}
-        >
-          Both watched
-        </Link>
-        <Link
-          href={`${base}?mode=either${list ? `&list=${list}` : ""}`}
-          scroll={false}
-          className={[
-            "rounded-full border px-3 py-1 text-xs transition",
-            mode === "either"
-              ? "border-gold bg-gold/10 text-gold"
-              : "border-zinc-700 text-zinc-400 hover:border-gold/50",
-          ].join(" ")}
-        >
-          Either watched
-        </Link>
+        {(["both", "either"] as const).map((m) => {
+          const params = new URLSearchParams();
+          params.set("mode", m);
+          if (list) params.set("list", list);
+          if (density === "dense") params.set("density", density);
+          const href = `${base}?${params.toString()}`;
+          return (
+            <Link
+              key={m}
+              href={href}
+              scroll={false}
+              className={[
+                "rounded-full border px-3 py-1 text-xs transition",
+                mode === m
+                  ? "border-gold bg-gold/10 text-gold"
+                  : "border-zinc-700 text-zinc-400 hover:border-gold/50",
+              ].join(" ")}
+            >
+              {m === "both" ? "Both watched" : "Either watched"}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mb-6 text-xs text-zinc-500">
@@ -155,6 +155,8 @@ export default async function TogetherPage({
         watchedSlugs={slugs}
         username={usernames.join("/")}
         basePath={base}
+        density={density}
+        extraParams={{ mode }}
       />
     </main>
   );

@@ -6,10 +6,11 @@ import { ListView } from "@/components/ListView";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
 import type { ListId } from "@/types";
+import type { Density } from "@/components/PosterGrid";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ list?: string }>;
+type SearchParams = Promise<{ list?: string; density?: string }>;
 type Params = Promise<{ username: string }>;
 
 function isListId(v: string | undefined): v is ListId {
@@ -29,9 +30,10 @@ export default async function UserPage({
   searchParams: SearchParams;
 }) {
   const { username: rawUsername } = await params;
-  const { list: rawList } = await searchParams;
+  const { list: rawList, density: rawDensity } = await searchParams;
   const username = normalizeUsername(rawUsername);
   const activeList: ListId = isListId(rawList) ? rawList : "imdb-top-100";
+  const density: Density = rawDensity === "dense" ? "dense" : "comfy";
 
   let user;
   try {
@@ -44,7 +46,7 @@ export default async function UserPage({
   const hasCsv = user.csvUploadedAt != null;
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
+    <main className="mx-auto max-w-[1800px] px-4 py-8">
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
@@ -70,7 +72,12 @@ export default async function UserPage({
         <ComparePartnerForm self={username} />
       </div>
 
-      <ListView activeList={activeList} watchedSlugs={user.watchedSlugs} username={username} />
+      <ListView
+        activeList={activeList}
+        watchedSlugs={user.watchedSlugs}
+        username={username}
+        density={density}
+      />
     </main>
   );
 }

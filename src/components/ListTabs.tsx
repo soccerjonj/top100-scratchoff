@@ -12,11 +12,18 @@ const ORDER: ListId[] = [
 export function ListTabs({
   active,
   basePath,
+  extraParams = {},
 }: {
   active: ListId;
-  /** e.g. "/u/soccerjonj" or "/together/soccerjonj/partner". */
   basePath: string;
+  extraParams?: Record<string, string>;
 }) {
+  const make = (id: ListId) => {
+    const params = new URLSearchParams();
+    params.set("list", id);
+    for (const [k, v] of Object.entries(extraParams)) if (v) params.set(k, v);
+    return `${basePath}?${params.toString()}`;
+  };
   return (
     <nav className="flex flex-wrap gap-2 border-b border-zinc-800 pb-2">
       {ORDER.map((id) => {
@@ -24,7 +31,7 @@ export function ListTabs({
         return (
           <Link
             key={id}
-            href={`${basePath}?list=${id}`}
+            href={make(id)}
             scroll={false}
             className={[
               "rounded-full border px-4 py-1.5 text-sm transition",
