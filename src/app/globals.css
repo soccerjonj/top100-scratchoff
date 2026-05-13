@@ -36,3 +36,19 @@ html, body {
 .poster-card {
   transition: filter 400ms ease, transform 400ms ease, opacity 400ms ease;
 }
+
+/* Grid density. Mobile gets tighter minmax so far more posters fit on screen. */
+.poster-grid-dense {
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+}
+.poster-grid-comfy {
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+}
+@media (min-width: 640px) {
+  .poster-grid-dense {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+  .poster-grid-comfy {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+}

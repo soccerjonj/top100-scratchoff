@@ -10,7 +10,7 @@ export function ListView({
   watchedSlugs,
   username,
   basePath,
-  density = "comfy",
+  density = "dense",
   extraParams = {},
 }: {
   activeList: ListId;
@@ -30,7 +30,7 @@ export function ListView({
 
   return (
     <div className="flex flex-col gap-5">
-      <ListTabs active={activeList} basePath={tabsBase} extraParams={{ ...extraParams, ...(density === "dense" ? { density } : {}) }} />
+      <ListTabs active={activeList} basePath={tabsBase} extraParams={{ ...extraParams, ...(density === "comfy" ? { density } : {}) }} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex-1 min-w-[240px]">
           <ProgressBar watched={watchedInList} total={list.entries.length} />

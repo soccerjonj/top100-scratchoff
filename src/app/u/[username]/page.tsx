@@ -62,7 +62,7 @@ export default async function UserPage({
   const { list: rawList, density: rawDensity } = await searchParams;
   const username = normalizeUsername(rawUsername);
   const activeList: ListId = isListId(rawList) ? rawList : "imdb-top-100";
-  const density: Density = rawDensity === "dense" ? "dense" : "comfy";
+  const density: Density = rawDensity === "comfy" ? "comfy" : "dense";
 
   let user;
   try {

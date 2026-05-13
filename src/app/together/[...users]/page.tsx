@@ -56,7 +56,7 @@ export default async function TogetherPage({
 
   const activeList: ListId = isListId(list) ? list : "imdb-top-100";
   const mode: Mode = isMode(rawMode) ? rawMode : "both";
-  const density: Density = rawDensity === "dense" ? "dense" : "comfy";
+  const density: Density = rawDensity === "comfy" ? "comfy" : "dense";
 
   const records: UserRecord[] = [];
   for (const u of usernames) {
@@ -111,7 +111,7 @@ export default async function TogetherPage({
           const params = new URLSearchParams();
           params.set("mode", m);
           if (list) params.set("list", list);
-          if (density === "dense") params.set("density", density);
+          if (density === "comfy") params.set("density", density);
           const href = `${base}?${params.toString()}`;
           return (
             <Link

@@ -19,13 +19,14 @@ export function DensityToggle({
     for (const [k, v] of Object.entries(extraParams)) {
       if (v) params.set(k, v);
     }
-    if (d !== "comfy") params.set("density", d);
+    // Default is "dense" — only encode the non-default in URLs.
+    if (d !== "dense") params.set("density", d);
     return `${basePath}?${params.toString()}`;
   };
   return (
     <nav className="flex items-center gap-1 text-xs">
       <span className="text-zinc-600">Size:</span>
-      {(["comfy", "dense"] as const).map((d) => {
+      {(["dense", "comfy"] as const).map((d) => {
         const active = d === density;
         return (
           <Link
