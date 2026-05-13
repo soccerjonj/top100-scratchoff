@@ -4,6 +4,7 @@ import { LISTS } from "@/lib/lists";
 
 const ORDER: ListId[] = [
   "imdb-top-100",
+  "afi-top-100",
   "nyt-top-100",
   "letterboxd-top-500",
 ];

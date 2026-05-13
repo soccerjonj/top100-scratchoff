@@ -155,6 +155,11 @@ const SLUG_FIRST_LISTS: Record<string, { url: string; outFile: string; label: st
     outFile: "nyt-top-100.json",
     label: "nyt",
   },
+  afi: {
+    url: "https://letterboxd.com/afi/list/afis-100-years100-movies-10th-anniversary",
+    outFile: "afi-top-100.json",
+    label: "afi",
+  },
 };
 
 async function scrapeListSlugs(listUrl: string, label: string): Promise<string[]> {
@@ -232,14 +237,16 @@ async function main() {
   const wantAll = args.includes("--all");
   const wantLb = wantAll || args.includes("--letterboxd");
   const wantNyt = wantAll || args.includes("--nyt");
+  const wantAfi = wantAll || args.includes("--afi");
   const wantImdb =
     wantAll ||
     args.includes("--imdb") ||
-    (!wantLb && !wantNyt && args.length === 0);
+    (!wantLb && !wantNyt && !wantAfi && args.length === 0);
 
   if (wantImdb) await buildImdb();
   if (wantLb) await buildSlugFirstList("letterboxd");
   if (wantNyt) await buildSlugFirstList("nyt");
+  if (wantAfi) await buildSlugFirstList("afi");
 }
 
 main().catch((e) => {

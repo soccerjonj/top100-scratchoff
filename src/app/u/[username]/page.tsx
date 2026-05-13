@@ -14,7 +14,10 @@ type Params = Promise<{ username: string }>;
 
 function isListId(v: string | undefined): v is ListId {
   return (
-    v === "imdb-top-100" || v === "letterboxd-top-500" || v === "nyt-top-100"
+    v === "imdb-top-100" ||
+    v === "letterboxd-top-500" ||
+    v === "nyt-top-100" ||
+    v === "afi-top-100"
   );
 }
 

@@ -1,0 +1,802 @@
+[
+  {
+    "rank": 1,
+    "title": "Citizen Kane",
+    "year": 1941,
+    "tmdbId": 15,
+    "posterPath": "/sav0jxhqiH0bPr2vZFU0Kjt2nZL.jpg",
+    "letterboxdSlug": "citizen-kane"
+  },
+  {
+    "rank": 2,
+    "title": "The Godfather",
+    "year": 1972,
+    "tmdbId": 238,
+    "posterPath": "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+    "letterboxdSlug": "the-godfather"
+  },
+  {
+    "rank": 3,
+    "title": "Casablanca",
+    "year": 1943,
+    "tmdbId": 289,
+    "posterPath": "/lGCEKlJo2CnWydQj7aamY7s1S7Q.jpg",
+    "letterboxdSlug": "casablanca"
+  },
+  {
+    "rank": 4,
+    "title": "Raging Bull",
+    "year": 1980,
+    "tmdbId": 1578,
+    "posterPath": "/1WV7WlTS8LI1L5NkCgjWT9GSW3O.jpg",
+    "letterboxdSlug": "raging-bull"
+  },
+  {
+    "rank": 5,
+    "title": "Singin' in the Rain",
+    "year": 1952,
+    "tmdbId": 872,
+    "posterPath": "/w03EiJVHP8Un77boQeE7hg9DVdU.jpg",
+    "letterboxdSlug": "singin-in-the-rain"
+  },
+  {
+    "rank": 6,
+    "title": "Gone with the Wind",
+    "year": 1939,
+    "tmdbId": 770,
+    "posterPath": "/lNz2Ow0wGCAvzckW7EOjE03KcYv.jpg",
+    "letterboxdSlug": "gone-with-the-wind"
+  },
+  {
+    "rank": 7,
+    "title": "Lawrence of Arabia",
+    "year": 1962,
+    "tmdbId": 947,
+    "posterPath": "/AiAm0EtDvyGqNpVoieRw4u65vD1.jpg",
+    "letterboxdSlug": "lawrence-of-arabia"
+  },
+  {
+    "rank": 8,
+    "title": "Schindler's List",
+    "year": 1993,
+    "tmdbId": 424,
+    "posterPath": "/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
+    "letterboxdSlug": "schindlers-list"
+  },
+  {
+    "rank": 9,
+    "title": "Vertigo",
+    "year": 1958,
+    "tmdbId": 426,
+    "posterPath": "/15uOEfqBNTVtDUT7hGBVCka0rZz.jpg",
+    "letterboxdSlug": "vertigo"
+  },
+  {
+    "rank": 10,
+    "title": "The Wizard of Oz",
+    "year": 1939,
+    "tmdbId": 630,
+    "posterPath": "/uCC3j4pV9eOZwzDUWp2ilbcTf1f.jpg",
+    "letterboxdSlug": "the-wizard-of-oz-1939"
+  },
+  {
+    "rank": 11,
+    "title": "City Lights",
+    "year": 1931,
+    "tmdbId": 901,
+    "posterPath": "/bXNvzjULc9jrOVhGfjcc64uKZmZ.jpg",
+    "letterboxdSlug": "city-lights"
+  },
+  {
+    "rank": 12,
+    "title": "The Searchers",
+    "year": 1956,
+    "tmdbId": 3114,
+    "posterPath": "/jLBmgW0epNzJ1N9uzaVCjbyT94v.jpg",
+    "letterboxdSlug": "the-searchers"
+  },
+  {
+    "rank": 13,
+    "title": "Star Wars",
+    "year": 1977,
+    "tmdbId": 11,
+    "posterPath": "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
+    "letterboxdSlug": "star-wars"
+  },
+  {
+    "rank": 14,
+    "title": "Psycho",
+    "year": 1960,
+    "tmdbId": 539,
+    "posterPath": "/yz4QVqPx3h1hD1DfqqQkCq3rmxW.jpg",
+    "letterboxdSlug": "psycho"
+  },
+  {
+    "rank": 15,
+    "title": "2001: A Space Odyssey",
+    "year": 1968,
+    "tmdbId": 62,
+    "posterPath": "/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
+    "letterboxdSlug": "2001-a-space-odyssey"
+  },
+  {
+    "rank": 16,
+    "title": "Sunset Boulevard",
+    "year": 1950,
+    "tmdbId": 599,
+    "posterPath": "/zt8aQ6ksqK6p1AopC5zVTDS9pKT.jpg",
+    "letterboxdSlug": "sunset-boulevard"
+  },
+  {
+    "rank": 17,
+    "title": "The Graduate",
+    "year": 1967,
+    "tmdbId": 37247,
+    "posterPath": "/z1Z1tZMR66RxcNeHbwoEhYeqOlP.jpg",
+    "letterboxdSlug": "the-graduate"
+  },
+  {
+    "rank": 18,
+    "title": "The General",
+    "year": 1926,
+    "tmdbId": 961,
+    "posterPath": "/nIp4gIXogCjfB1QABNsWwa9gSca.jpg",
+    "letterboxdSlug": "the-general"
+  },
+  {
+    "rank": 19,
+    "title": "On the Waterfront",
+    "year": 1954,
+    "tmdbId": 654,
+    "posterPath": "/v1RtJ1qR4v9nrnfoBVBl6hjTW9.jpg",
+    "letterboxdSlug": "on-the-waterfront"
+  },
+  {
+    "rank": 20,
+    "title": "It's a Wonderful Life",
+    "year": 1946,
+    "tmdbId": 1585,
+    "posterPath": "/bSqt9rhDZx1Q7UZ86dBPKdNomp2.jpg",
+    "letterboxdSlug": "its-a-wonderful-life"
+  },
+  {
+    "rank": 21,
+    "title": "Chinatown",
+    "year": 1974,
+    "tmdbId": 829,
+    "posterPath": "/kZRSP3FmOcq0xnBulqpUQngJUXY.jpg",
+    "letterboxdSlug": "chinatown"
+  },
+  {
+    "rank": 22,
+    "title": "Some Like It Hot",
+    "year": 1959,
+    "tmdbId": 239,
+    "posterPath": "/hVIKyTK13AvOGv7ICmJjK44DTzp.jpg",
+    "letterboxdSlug": "some-like-it-hot"
+  },
+  {
+    "rank": 23,
+    "title": "The Grapes of Wrath",
+    "year": 1940,
+    "tmdbId": 596,
+    "posterPath": "/eUcxMVBIA0Jg8l1RGUqycrc3eIQ.jpg",
+    "letterboxdSlug": "the-grapes-of-wrath"
+  },
+  {
+    "rank": 24,
+    "title": "E.T. the Extra-Terrestrial",
+    "year": 1982,
+    "tmdbId": 601,
+    "posterPath": "/an0nD6uq6byfxXCfk6lQBzdL2J1.jpg",
+    "letterboxdSlug": "et-the-extra-terrestrial"
+  },
+  {
+    "rank": 25,
+    "title": "To Kill a Mockingbird",
+    "year": 1962,
+    "tmdbId": 595,
+    "posterPath": "/gZycFUMLx2110dzK3nBNai7gfpM.jpg",
+    "letterboxdSlug": "to-kill-a-mockingbird"
+  },
+  {
+    "rank": 26,
+    "title": "Mr. Smith Goes to Washington",
+    "year": 1939,
+    "tmdbId": 3083,
+    "posterPath": "/nDjg1fbNyq15excNDl3acd2IqAk.jpg",
+    "letterboxdSlug": "mr-smith-goes-to-washington"
+  },
+  {
+    "rank": 27,
+    "title": "High Noon",
+    "year": 1952,
+    "tmdbId": 288,
+    "posterPath": "/qETSMQ4IXBSAS409Z9OL0ppXWTW.jpg",
+    "letterboxdSlug": "high-noon"
+  },
+  {
+    "rank": 28,
+    "title": "All About Eve",
+    "year": 1950,
+    "tmdbId": 705,
+    "posterPath": "/blBzZaatPWVuWpXEnPscMA4Xp6m.jpg",
+    "letterboxdSlug": "all-about-eve"
+  },
+  {
+    "rank": 29,
+    "title": "Double Indemnity",
+    "year": 1944,
+    "tmdbId": 996,
+    "posterPath": "/rVNYZZgfhwqVMMWlBmxOfWqnwCj.jpg",
+    "letterboxdSlug": "double-indemnity"
+  },
+  {
+    "rank": 30,
+    "title": "Apocalypse Now",
+    "year": 1979,
+    "tmdbId": 28,
+    "posterPath": "/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg",
+    "letterboxdSlug": "apocalypse-now"
+  },
+  {
+    "rank": 31,
+    "title": "The Maltese Falcon",
+    "year": 1941,
+    "tmdbId": 963,
+    "posterPath": "/bf4o6Uzw5wqLjdKwRuiDrN1xyvl.jpg",
+    "letterboxdSlug": "the-maltese-falcon-1941"
+  },
+  {
+    "rank": 32,
+    "title": "The Godfather Part II",
+    "year": 1974,
+    "tmdbId": 240,
+    "posterPath": "/hek3koDUyRQk7FIhPXsa6mT2Zc3.jpg",
+    "letterboxdSlug": "the-godfather-part-ii"
+  },
+  {
+    "rank": 33,
+    "title": "One Flew Over the Cuckoo's Nest",
+    "year": 1975,
+    "tmdbId": 510,
+    "posterPath": "/kjWsMh72V6d8KRLV4EOoSJLT1H7.jpg",
+    "letterboxdSlug": "one-flew-over-the-cuckoos-nest"
+  },
+  {
+    "rank": 34,
+    "title": "Snow White and the Seven Dwarfs",
+    "year": 1938,
+    "tmdbId": 408,
+    "posterPath": "/3VAHfuNb6Z7UiW12iYKANSPBl8m.jpg",
+    "letterboxdSlug": "snow-white-and-the-seven-dwarfs"
+  },
+  {
+    "rank": 35,
+    "title": "Annie Hall",
+    "year": 1977,
+    "tmdbId": 703,
+    "posterPath": "/dEtjPywhDbAXYjoFfhBC4U9unU7.jpg",
+    "letterboxdSlug": "annie-hall"
+  },
+  {
+    "rank": 36,
+    "title": "The Bridge on the River Kwai",
+    "year": 1957,
+    "tmdbId": 826,
+    "posterPath": "/7paXMt2e3Tr5dLmEZOGgFEn2Vo7.jpg",
+    "letterboxdSlug": "the-bridge-on-the-river-kwai"
+  },
+  {
+    "rank": 37,
+    "title": "The Best Years of Our Lives",
+    "year": 1946,
+    "tmdbId": 887,
+    "posterPath": "/gd5EoAU4MM57sW3vlWxJ0NMM8cV.jpg",
+    "letterboxdSlug": "the-best-years-of-our-lives"
+  },
+  {
+    "rank": 38,
+    "title": "The Treasure of the Sierra Madre",
+    "year": 1948,
+    "tmdbId": 3090,
+    "posterPath": "/pWcst7zVbi8Z8W6GFrdNE7HHRxL.jpg",
+    "letterboxdSlug": "the-treasure-of-the-sierra-madre"
+  },
+  {
+    "rank": 39,
+    "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+    "year": 1964,
+    "tmdbId": 935,
+    "posterPath": "/6x7MzQ6BOMlRzam1StcmPO9v61g.jpg",
+    "letterboxdSlug": "dr-strangelove-or-how-i-learned-to-stop-worrying-and-love-the-bomb"
+  },
+  {
+    "rank": 40,
+    "title": "The Sound of Music",
+    "year": 1965,
+    "tmdbId": 15121,
+    "posterPath": "/c6CrUZypAsBCaRWX0M3RVRDbhNS.jpg",
+    "letterboxdSlug": "the-sound-of-music"
+  },
+  {
+    "rank": 41,
+    "title": "King Kong",
+    "year": 1933,
+    "tmdbId": 244,
+    "posterPath": "/lHlnxKL5GbgRibyRFI7n1Ey850i.jpg",
+    "letterboxdSlug": "king-kong"
+  },
+  {
+    "rank": 42,
+    "title": "Bonnie and Clyde",
+    "year": 1967,
+    "tmdbId": 475,
+    "posterPath": "/psITX0BMm6BTKMZZjpcXO93yjbb.jpg",
+    "letterboxdSlug": "bonnie-and-clyde"
+  },
+  {
+    "rank": 43,
+    "title": "Midnight Cowboy",
+    "year": 1969,
+    "tmdbId": 3116,
+    "posterPath": "/ckklq45UxUkwgHve9xItXqXr06r.jpg",
+    "letterboxdSlug": "midnight-cowboy"
+  },
+  {
+    "rank": 44,
+    "title": "The Philadelphia Story",
+    "year": 1940,
+    "tmdbId": 981,
+    "posterPath": "/dKUubjvxO78XDts6VP1Ggcp4R9O.jpg",
+    "letterboxdSlug": "the-philadelphia-story"
+  },
+  {
+    "rank": 45,
+    "title": "Shane",
+    "year": 1953,
+    "tmdbId": 3110,
+    "posterPath": "/svr5ADpjXTCOQv8hmuJnB7I14Qv.jpg",
+    "letterboxdSlug": "shane"
+  },
+  {
+    "rank": 46,
+    "title": "It Happened One Night",
+    "year": 1934,
+    "tmdbId": 3078,
+    "posterPath": "/2PNUGWAflH6UUumas0POMmokHlc.jpg",
+    "letterboxdSlug": "it-happened-one-night"
+  },
+  {
+    "rank": 47,
+    "title": "A Streetcar Named Desire",
+    "year": 1951,
+    "tmdbId": 702,
+    "posterPath": "/aicdlO5vt7z2ARm279eGzJeYCLQ.jpg",
+    "letterboxdSlug": "a-streetcar-named-desire"
+  },
+  {
+    "rank": 48,
+    "title": "Rear Window",
+    "year": 1954,
+    "tmdbId": 567,
+    "posterPath": "/ILVF0eJxHMddjxeQhswFtpMtqx.jpg",
+    "letterboxdSlug": "rear-window"
+  },
+  {
+    "rank": 49,
+    "title": "Intolerance: Love's Struggle Throughout the Ages",
+    "year": 1916,
+    "tmdbId": 3059,
+    "posterPath": "/lJCabs4TMOsKfnl0BmA5Hf16Ezb.jpg",
+    "letterboxdSlug": "intolerance-loves-struggle-throughout-the-ages"
+  },
+  {
+    "rank": 50,
+    "title": "The Lord of the Rings: The Fellowship of the Ring",
+    "year": 2001,
+    "tmdbId": 120,
+    "posterPath": "/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg",
+    "letterboxdSlug": "the-lord-of-the-rings-the-fellowship-of-the-ring"
+  },
+  {
+    "rank": 51,
+    "title": "West Side Story",
+    "year": 1961,
+    "tmdbId": 1725,
+    "posterPath": "/nzCMu6D5q60i2bVrIQ0DxlRSgCZ.jpg",
+    "letterboxdSlug": "west-side-story"
+  },
+  {
+    "rank": 52,
+    "title": "Taxi Driver",
+    "year": 1976,
+    "tmdbId": 103,
+    "posterPath": "/ekstpH614fwDX8DUln1a2Opz0N8.jpg",
+    "letterboxdSlug": "taxi-driver"
+  },
+  {
+    "rank": 53,
+    "title": "The Deer Hunter",
+    "year": 1978,
+    "tmdbId": 11778,
+    "posterPath": "/bbGtogDZOg09bm42KIpCXUXICkh.jpg",
+    "letterboxdSlug": "the-deer-hunter"
+  },
+  {
+    "rank": 54,
+    "title": "M*A*S*H",
+    "year": 1970,
+    "tmdbId": 651,
+    "posterPath": "/on8Q9LhtHYNhmITjUMpgOUkIG8o.jpg",
+    "letterboxdSlug": "mash"
+  },
+  {
+    "rank": 55,
+    "title": "North by Northwest",
+    "year": 1959,
+    "tmdbId": 213,
+    "posterPath": "/kNOFPQrel9YFCVzI0DF8FnCEpCw.jpg",
+    "letterboxdSlug": "north-by-northwest"
+  },
+  {
+    "rank": 56,
+    "title": "Jaws",
+    "year": 1975,
+    "tmdbId": 578,
+    "posterPath": "/tjbLSFwi0I3phZwh8zoHWNfbsEp.jpg",
+    "letterboxdSlug": "jaws"
+  },
+  {
+    "rank": 57,
+    "title": "Rocky",
+    "year": 1976,
+    "tmdbId": 1366,
+    "posterPath": "/hEjK9A9BkNXejFW4tfacVAEHtkn.jpg",
+    "letterboxdSlug": "rocky"
+  },
+  {
+    "rank": 58,
+    "title": "The Gold Rush",
+    "year": 1925,
+    "tmdbId": 962,
+    "posterPath": "/eQRFo1qwRREYwj47Yoe1PisgOle.jpg",
+    "letterboxdSlug": "the-gold-rush"
+  },
+  {
+    "rank": 59,
+    "title": "Nashville",
+    "year": 1975,
+    "tmdbId": 3121,
+    "posterPath": "/twl4ovyjb8muFKvZmcCDzPR0hy1.jpg",
+    "letterboxdSlug": "nashville"
+  },
+  {
+    "rank": 60,
+    "title": "Duck Soup",
+    "year": 1933,
+    "tmdbId": 3063,
+    "posterPath": "/31t63plEGKHhYuuCpC9bFWO9SBS.jpg",
+    "letterboxdSlug": "duck-soup-1933"
+  },
+  {
+    "rank": 61,
+    "title": "Sullivan's Travels",
+    "year": 1941,
+    "tmdbId": 16305,
+    "posterPath": "/z5cqIM0ysVjkCmaDfyTQnlozdIp.jpg",
+    "letterboxdSlug": "sullivans-travels"
+  },
+  {
+    "rank": 62,
+    "title": "American Graffiti",
+    "year": 1973,
+    "tmdbId": 838,
+    "posterPath": "/1tjLivPad2PX8FAzWko7FPIb8d2.jpg",
+    "letterboxdSlug": "american-graffiti"
+  },
+  {
+    "rank": 63,
+    "title": "Cabaret",
+    "year": 1972,
+    "tmdbId": 10784,
+    "posterPath": "/fMhOeJ2TvuY46iYGmsowhgRXfnr.jpg",
+    "letterboxdSlug": "cabaret"
+  },
+  {
+    "rank": 64,
+    "title": "Network",
+    "year": 1976,
+    "tmdbId": 10774,
+    "posterPath": "/qZomlHsaALUtkFeMDwdYmwS2Pbo.jpg",
+    "letterboxdSlug": "network"
+  },
+  {
+    "rank": 65,
+    "title": "The African Queen",
+    "year": 1952,
+    "tmdbId": 488,
+    "posterPath": "/2Ypg0KhQfFYWILelvHGtSHHR0dk.jpg",
+    "letterboxdSlug": "the-african-queen"
+  },
+  {
+    "rank": 66,
+    "title": "Raiders of the Lost Ark",
+    "year": 1981,
+    "tmdbId": 85,
+    "posterPath": "/ceG9VzoRAVGwivFU403Wc3AHRys.jpg",
+    "letterboxdSlug": "raiders-of-the-lost-ark"
+  },
+  {
+    "rank": 67,
+    "title": "Who's Afraid of Virginia Woolf?",
+    "year": 1966,
+    "tmdbId": 396,
+    "posterPath": "/wF7ihB5V5gSm6zxjv3ZhHOpgREI.jpg",
+    "letterboxdSlug": "whos-afraid-of-virginia-woolf"
+  },
+  {
+    "rank": 68,
+    "title": "Unforgiven",
+    "year": 1992,
+    "tmdbId": 33,
+    "posterPath": "/54roTwbX9fltg85zjsmrooXAs12.jpg",
+    "letterboxdSlug": "unforgiven"
+  },
+  {
+    "rank": 69,
+    "title": "Tootsie",
+    "year": 1982,
+    "tmdbId": 9576,
+    "posterPath": "/ngyCzZwb9y5sMUCig5JQT4Y33Q.jpg",
+    "letterboxdSlug": "tootsie"
+  },
+  {
+    "rank": 70,
+    "title": "A Clockwork Orange",
+    "year": 1971,
+    "tmdbId": 185,
+    "posterPath": "/4sHeTAp65WrSSuc05nRBKddhBxO.jpg",
+    "letterboxdSlug": "a-clockwork-orange"
+  },
+  {
+    "rank": 71,
+    "title": "Saving Private Ryan",
+    "year": 1998,
+    "tmdbId": 857,
+    "posterPath": "/uqx37cS8cpHg8U35f9U5IBlrCV3.jpg",
+    "letterboxdSlug": "saving-private-ryan"
+  },
+  {
+    "rank": 72,
+    "title": "The Shawshank Redemption",
+    "year": 1994,
+    "tmdbId": 278,
+    "posterPath": "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
+    "letterboxdSlug": "the-shawshank-redemption"
+  },
+  {
+    "rank": 73,
+    "title": "Butch Cassidy and the Sundance Kid",
+    "year": 1969,
+    "tmdbId": 642,
+    "posterPath": "/gFmmykF1Ym3OGzENo50nZQaD1dx.jpg",
+    "letterboxdSlug": "butch-cassidy-and-the-sundance-kid"
+  },
+  {
+    "rank": 74,
+    "title": "The Silence of the Lambs",
+    "year": 1991,
+    "tmdbId": 274,
+    "posterPath": "/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg",
+    "letterboxdSlug": "the-silence-of-the-lambs"
+  },
+  {
+    "rank": 75,
+    "title": "In the Heat of the Night",
+    "year": 1967,
+    "tmdbId": 10633,
+    "posterPath": "/qFpfALhprXmOAbA5upTNupZw8rq.jpg",
+    "letterboxdSlug": "in-the-heat-of-the-night"
+  },
+  {
+    "rank": 76,
+    "title": "Forrest Gump",
+    "year": 1994,
+    "tmdbId": 13,
+    "posterPath": "/Cw4hIUIAmSYfK9QfaUW5igp9La.jpg",
+    "letterboxdSlug": "forrest-gump"
+  },
+  {
+    "rank": 77,
+    "title": "All the President's Men",
+    "year": 1976,
+    "tmdbId": 891,
+    "posterPath": "/cPtSHR7D2WGsDBfnC5DxV927hKn.jpg",
+    "letterboxdSlug": "all-the-presidents-men"
+  },
+  {
+    "rank": 78,
+    "title": "Modern Times",
+    "year": 1936,
+    "tmdbId": 3082,
+    "posterPath": "/7uoiKOEjxBBW0AgDGQWrlfGQ90w.jpg",
+    "letterboxdSlug": "modern-times"
+  },
+  {
+    "rank": 79,
+    "title": "The Wild Bunch",
+    "year": 1969,
+    "tmdbId": 576,
+    "posterPath": "/8j9yEC3xjy1PJDSizIbaxcHaSph.jpg",
+    "letterboxdSlug": "the-wild-bunch"
+  },
+  {
+    "rank": 80,
+    "title": "The Apartment",
+    "year": 1960,
+    "tmdbId": 284,
+    "posterPath": "/hhSRt1KKfRT0yEhEtRW3qp31JFU.jpg",
+    "letterboxdSlug": "the-apartment"
+  },
+  {
+    "rank": 81,
+    "title": "Spartacus",
+    "year": 1960,
+    "tmdbId": 967,
+    "posterPath": "/r0Fgg1GyZgzokaiw2HFQv3oPaL2.jpg",
+    "letterboxdSlug": "spartacus"
+  },
+  {
+    "rank": 82,
+    "title": "Sunrise: A Song of Two Humans",
+    "year": 1927,
+    "tmdbId": 631,
+    "posterPath": "/oj8ZW8jKXBSs8F1e5iWsTUeXSJW.jpg",
+    "letterboxdSlug": "sunrise-a-song-of-two-humans"
+  },
+  {
+    "rank": 83,
+    "title": "Titanic",
+    "year": 1997,
+    "tmdbId": 597,
+    "posterPath": "/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+    "letterboxdSlug": "titanic-1997"
+  },
+  {
+    "rank": 84,
+    "title": "Easy Rider",
+    "year": 1969,
+    "tmdbId": 624,
+    "posterPath": "/mmGEB6ly9OG8SYVfvAoa6QqHNvN.jpg",
+    "letterboxdSlug": "easy-rider"
+  },
+  {
+    "rank": 85,
+    "title": "A Night at the Opera",
+    "year": 1935,
+    "tmdbId": 37719,
+    "posterPath": "/A4YDGfJwaG7aMxDVrVJsOHJ7ufK.jpg",
+    "letterboxdSlug": "a-night-at-the-opera"
+  },
+  {
+    "rank": 86,
+    "title": "Platoon",
+    "year": 1986,
+    "tmdbId": 792,
+    "posterPath": "/m3mmFkPQKvPZq5exmh0bDuXlD9T.jpg",
+    "letterboxdSlug": "platoon"
+  },
+  {
+    "rank": 87,
+    "title": "12 Angry Men",
+    "year": 1957,
+    "tmdbId": 389,
+    "posterPath": "/zhG3vKWyDRaZYoaww1UVAi29T9h.jpg",
+    "letterboxdSlug": "12-angry-men"
+  },
+  {
+    "rank": 88,
+    "title": "Bringing Up Baby",
+    "year": 1938,
+    "tmdbId": 900,
+    "posterPath": "/vTNNOtemaYmtx3k2NpsLMRJKEwZ.jpg",
+    "letterboxdSlug": "bringing-up-baby"
+  },
+  {
+    "rank": 89,
+    "title": "The Sixth Sense",
+    "year": 1999,
+    "tmdbId": 745,
+    "posterPath": "/vOyfUXNFSnaTk7Vk5AjpsKTUWsu.jpg",
+    "letterboxdSlug": "the-sixth-sense"
+  },
+  {
+    "rank": 90,
+    "title": "Swing Time",
+    "year": 1936,
+    "tmdbId": 20325,
+    "posterPath": "/3iukS0hzUAmhwHdqWrgQuKwMnJY.jpg",
+    "letterboxdSlug": "swing-time"
+  },
+  {
+    "rank": 91,
+    "title": "Sophie's Choice",
+    "year": 1982,
+    "tmdbId": 15764,
+    "posterPath": "/rZDPbPTFwuKgr5b9jixGFNYkGYt.jpg",
+    "letterboxdSlug": "sophies-choice"
+  },
+  {
+    "rank": 92,
+    "title": "GoodFellas",
+    "year": 1990,
+    "tmdbId": 769,
+    "posterPath": "/9OkCLM73MIU2CrKZbqiT8Ln1wY2.jpg",
+    "letterboxdSlug": "goodfellas"
+  },
+  {
+    "rank": 93,
+    "title": "The French Connection",
+    "year": 1971,
+    "tmdbId": 1051,
+    "posterPath": "/pH4saPwMjhnVGwmSH6RkMaHrt3s.jpg",
+    "letterboxdSlug": "the-french-connection"
+  },
+  {
+    "rank": 94,
+    "title": "Pulp Fiction",
+    "year": 1994,
+    "tmdbId": 680,
+    "posterPath": "/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg",
+    "letterboxdSlug": "pulp-fiction"
+  },
+  {
+    "rank": 95,
+    "title": "The Last Picture Show",
+    "year": 1971,
+    "tmdbId": 25188,
+    "posterPath": "/7NYePZc0lZrRomtmQsjOJMePTEb.jpg",
+    "letterboxdSlug": "the-last-picture-show"
+  },
+  {
+    "rank": 96,
+    "title": "Do the Right Thing",
+    "year": 1989,
+    "tmdbId": 925,
+    "posterPath": "/63rmSDPahrH7C1gEFYzRuIBAN9W.jpg",
+    "letterboxdSlug": "do-the-right-thing"
+  },
+  {
+    "rank": 97,
+    "title": "Blade Runner",
+    "year": 1982,
+    "tmdbId": 78,
+    "posterPath": "/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg",
+    "letterboxdSlug": "blade-runner"
+  },
+  {
+    "rank": 98,
+    "title": "Yankee Doodle Dandy",
+    "year": 1942,
+    "tmdbId": 3087,
+    "posterPath": "/cqLLIyJFjLr6jGOxWVEHG11WGzB.jpg",
+    "letterboxdSlug": "yankee-doodle-dandy"
+  },
+  {
+    "rank": 99,
+    "title": "Toy Story",
+    "year": 1995,
+    "tmdbId": 862,
+    "posterPath": "/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+    "letterboxdSlug": "toy-story"
+  },
+  {
+    "rank": 100,
+    "title": "Ben-Hur",
+    "year": 1959,
+    "tmdbId": 665,
+    "posterPath": "/m4WQ1dBIrEIHZNCoAjdpxwSKWyH.jpg",
+    "letterboxdSlug": "ben-hur-1959"
+  }
+]
