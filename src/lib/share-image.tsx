@@ -234,8 +234,8 @@ function Grid({
               overflow: "hidden",
               background: "#111",
               boxShadow: watched
-                ? "inset 0 0 0 1px rgba(212,175,55,0.4)"
-                : "none",
+                ? "inset 0 0 0 2px #d4af37, 0 0 14px rgba(212,175,55,0.55)"
+                : "inset 0 0 0 1px rgba(255,255,255,0.04)",
             }}
           >
             {url ? (
@@ -249,8 +249,10 @@ function Grid({
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  filter: watched ? "none" : "grayscale(100%) brightness(0.45)",
-                  opacity: watched ? 1 : 0.5,
+                  filter: watched
+                    ? "saturate(1.2) contrast(1.05)"
+                    : "grayscale(100%) brightness(0.32)",
+                  opacity: watched ? 1 : 0.4,
                 }}
               />
             ) : (
@@ -262,7 +264,7 @@ function Grid({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: watched ? "#666" : "#444",
+                  color: watched ? "#d4af37" : "#333",
                   fontSize: spec.rankFont * 0.6,
                 }}
               >
