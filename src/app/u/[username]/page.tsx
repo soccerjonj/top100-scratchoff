@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
@@ -9,6 +10,34 @@ import type { ListId } from "@/types";
 import type { Density } from "@/components/PosterGrid";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const { username: raw } = await params;
+  const username = normalizeUsername(raw);
+  const title = `${username} · Top 100 Scratch-Off`;
+  const description = `Which films from the IMDB Top 100, AFI Top 100, NYT 100 Best of the 21st Century, and Letterboxd's Top 500 has ${username} watched?`;
+  const ogImage = `/api/share-image/${username}/imdb-top-100?size=og`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 type SearchParams = Promise<{ list?: string; density?: string }>;
 type Params = Promise<{ username: string }>;
@@ -70,6 +99,12 @@ export default async function UserPage({
       <div className="mb-6 flex flex-col gap-3">
         <CsvUpload username={username} hasCsv={hasCsv} />
         <ComparePartnerForm self={username} />
+        <Link
+          href={`/share/${username}/${activeList}`}
+          className="self-start rounded-md border border-gold bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold hover:bg-gold/20"
+        >
+          ✨ Share this list →
+        </Link>
       </div>
 
       <ListView
