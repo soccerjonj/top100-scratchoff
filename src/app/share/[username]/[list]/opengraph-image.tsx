@@ -24,4 +24,4 @@ export default async function OG({
     watchedSlugs: user?.watchedSlugs ?? [],
     username,
   });
-}
+} // returns Promise<Response>, which Next.js awaits automatically

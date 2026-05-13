@@ -86,10 +86,18 @@ function computeGrid(spec: Omit<SizeSpec, "cols" | "posterW" | "posterH" | "rank
   };
 }
 
-function posterUrl(posterPath: string | null): string | null {
+/**
+ * Pre-fetch all posters in parallel and convert to base64 data URLs.
+ *
+ * Satori (next/og) otherwise fetches each <img src=> serially during render,
+ * which is the dominant latency cost for these images (100 posters × ~200ms
+ * each = 20s+ in production). Doing it ourselves with Promise.all gives us
+ * real parallelism and embedding as data URLs means Satori doesn't touch
+ * the network during render.
+ */
+function posterUrl(posterPath: string | null, tier: string): string | null {
   if (!posterPath) return null;
-  // w185 is the smallest TMDB tier that still looks crisp at our cell sizes
-  return `https://image.tmdb.org/t/p/w185${posterPath}`;
+  return `https://image.tmdb.org/t/p/${tier}${posterPath}`;
 }
 
 interface RenderOpts {
@@ -111,6 +119,11 @@ export function renderShareImage({
   const watchedInList = entries.filter((e) => watchedSet.has(e.letterboxdSlug)).length;
   const spec = computeGrid(BASE[size], entries.length);
 
+  // Match TMDB poster tier to rendered cell size. Smaller files mean less
+  // for Satori to parse and faster fetches. Satori parallelises remote URLs
+  // internally so we leave the actual fetching to it.
+  const tier = spec.posterW <= 90 ? "w92" : "w185";
+
   return new ImageResponse(
     (
       <div
@@ -131,7 +144,7 @@ export function renderShareImage({
           total={entries.length}
           spec={spec}
         />
-        <Grid entries={entries} watchedSet={watchedSet} spec={spec} />
+        <Grid entries={entries} watchedSet={watchedSet} spec={spec} tier={tier} />
         <Brand spec={spec} />
       </div>
     ),
@@ -204,10 +217,12 @@ function Grid({
   entries,
   watchedSet,
   spec,
+  tier,
 }: {
   entries: FilmEntry[];
   watchedSet: Set<string>;
   spec: SizeSpec;
+  tier: string;
 }) {
   return (
     <div
@@ -222,7 +237,7 @@ function Grid({
     >
       {entries.map((entry) => {
         const watched = watchedSet.has(entry.letterboxdSlug);
-        const url = posterUrl(entry.posterPath);
+        const url = posterUrl(entry.posterPath, tier);
         return (
           <div
             key={entry.rank}

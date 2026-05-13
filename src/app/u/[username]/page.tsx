@@ -74,8 +74,14 @@ export default async function UserPage({
 
   const hasCsv = user.csvUploadedAt != null;
 
+  // Pre-warm the share image for the currently-active list so the CDN
+  // has it cached by the time the user clicks "Share". The browser will
+  // fetch this in parallel with the page render.
+  const preloadHref = `/api/share-image/${username}/${activeList}?size=og`;
+
   return (
     <main className="mx-auto max-w-[1800px] px-4 py-8">
+      <link rel="preload" as="image" href={preloadHref} />
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
