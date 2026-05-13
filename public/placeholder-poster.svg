@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 342 513" preserveAspectRatio="xMidYMid slice">
+  <rect width="342" height="513" fill="#1a1a1a"/>
+  <rect x="1" y="1" width="340" height="511" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+  <g fill="#3a3a3a" transform="translate(171 220)">
+    <circle r="38"/>
+    <path d="M-60 110 Q0 60 60 110 L60 140 L-60 140 Z"/>
+  </g>
+  <text x="171" y="430" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#555">no poster</text>
+</svg>
