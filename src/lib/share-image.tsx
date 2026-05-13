@@ -222,47 +222,7 @@ function Grid({
     >
       {entries.map((entry) => {
         const watched = watchedSet.has(entry.letterboxdSlug);
-        if (watched) {
-          const url = posterUrl(entry.posterPath);
-          return (
-            <div
-              key={entry.rank}
-              style={{
-                width: spec.posterW,
-                height: spec.posterH,
-                display: "flex",
-                overflow: "hidden",
-                background: "#111",
-              }}
-            >
-              {url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={url}
-                  alt=""
-                  width={spec.posterW}
-                  height={spec.posterH}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    background: "#222",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#666",
-                    fontSize: spec.rankFont * 0.6,
-                  }}
-                >
-                  ?
-                </div>
-              )}
-            </div>
-          );
-        }
+        const url = posterUrl(entry.posterPath);
         return (
           <div
             key={entry.rank}
@@ -270,15 +230,45 @@ function Grid({
               width: spec.posterW,
               height: spec.posterH,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "linear-gradient(135deg, #d4af37 0%, #8c7426 100%)",
-              color: "#0b0b0f",
-              fontWeight: 800,
-              fontSize: spec.rankFont,
+              position: "relative",
+              overflow: "hidden",
+              background: "#111",
+              boxShadow: watched
+                ? "inset 0 0 0 1px rgba(212,175,55,0.4)"
+                : "none",
             }}
           >
-            #{entry.rank}
+            {url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={url}
+                alt=""
+                width={spec.posterW}
+                height={spec.posterH}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  filter: watched ? "none" : "grayscale(100%) brightness(0.45)",
+                  opacity: watched ? 1 : 0.5,
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  background: watched ? "#222" : "#0b0b0f",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: watched ? "#666" : "#444",
+                  fontSize: spec.rankFont * 0.6,
+                }}
+              >
+                #{entry.rank}
+              </div>
+            )}
           </div>
         );
       })}
