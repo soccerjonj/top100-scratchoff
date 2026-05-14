@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { FilmEntry } from "@/types";
-import { posterUrl } from "@/lib/tmdb";
 
 interface MovieDetails {
   title: string;
@@ -140,14 +138,23 @@ export function PosterCard({
         ].join(" ")}
         title={`${entry.title} (${entry.year})`}
       >
-        <Image
-          src={posterUrl(entry.posterPath, "w342")}
-          alt={`${entry.title} (${entry.year}) poster`}
-          fill
-          sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 140px"
-          className="object-cover"
-          unoptimized={!entry.posterPath}
-        />
+        {entry.posterPath ? (
+          /* Direct TMDB CDN — skips the /_next/image proxy hop, hits a
+             long-cached CDN, and renders instantly when the bytes are in
+             the browser cache. */
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`https://image.tmdb.org/t/p/w185${entry.posterPath}`}
+            alt={`${entry.title} (${entry.year}) poster`}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 text-[10px] text-zinc-600">
+            no poster
+          </div>
+        )}
         <div className="absolute left-0.5 top-0.5 rounded bg-black/70 px-1 py-0 text-[8px] font-semibold text-gold sm:left-1 sm:top-1 sm:px-1.5 sm:py-0.5 sm:text-[10px]">
           #{entry.rank}
         </div>

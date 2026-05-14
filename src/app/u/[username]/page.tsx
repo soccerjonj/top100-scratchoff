@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
-import { ListView } from "@/components/ListView";
+import { ListSwitcher } from "@/components/ListSwitcher";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
 import type { ListId } from "@/types";
@@ -117,11 +117,10 @@ export default async function UserPage({
         </a>
       )}
 
-      <ListView
-        activeList={activeList}
+      <ListSwitcher
+        initialList={activeList}
+        initialDensity={density}
         watchedSlugs={effectiveWatched}
-        username={username}
-        density={density}
         ownerUsername={username}
       />
 
