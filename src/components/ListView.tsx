@@ -46,6 +46,7 @@ export function ListView({
         entries={list.entries}
         watchedSet={watchedSet}
         density={density}
+        listTitle={list.title}
       />
     </div>
   );

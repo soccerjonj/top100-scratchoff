@@ -14,10 +14,13 @@ export function PosterGrid({
   entries,
   watchedSet,
   density = "dense",
+  listTitle,
 }: {
   entries: FilmEntry[];
   watchedSet: Set<string>;
   density?: Density;
+  /** Shown in the per-movie dialog as "#N in {listTitle}". */
+  listTitle?: string;
 }) {
   return (
     <div className={`grid gap-1.5 sm:gap-2 ${CLASS_BY_DENSITY[density]}`}>
@@ -26,6 +29,7 @@ export function PosterGrid({
           key={`${entry.rank}-${entry.letterboxdSlug}`}
           entry={entry}
           watched={watchedSet.has(entry.letterboxdSlug)}
+          listTitle={listTitle}
         />
       ))}
     </div>
