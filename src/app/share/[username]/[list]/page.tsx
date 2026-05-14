@@ -5,6 +5,7 @@ import { LISTS } from "@/lib/lists";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import type { ListId } from "@/types";
+import { DownloadButton } from "@/components/DownloadButton";
 
 export const dynamic = "force-dynamic";
 
@@ -61,12 +62,7 @@ export default async function SharePage({ params }: { params: Params }) {
   const pct = total === 0 ? 0 : Math.round((watched / total) * 100);
 
   const apiBase = `/api/share-image/${username}/${list}`;
-  const previewSrc = `${apiBase}?size=og`;
-  // Square + story URLs without ?download=1 so the hidden preload imgs
-  // below share the exact same URL as the download anchors — one CDN
-  // cache entry serves both. The HTML `download` attribute on the <a>
-  // tags handles the "save as" UX without needing the Content-Disposition
-  // detour.
+  const ogSrc = `${apiBase}?size=og`;
   const squareSrc = `${apiBase}?size=square`;
   const storySrc = `${apiBase}?size=story`;
 
@@ -103,27 +99,32 @@ export default async function SharePage({ params }: { params: Params }) {
         </Link>
       </header>
 
-      <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={previewSrc}
-          alt={`${username} ${listMeta.title} share image`}
-          className="w-full"
-          width={1200}
-          height={630}
-        />
+      {/* Visible preview is the IG Story (1080×1920) since that's the
+          most common share target. Scaled down to a portrait frame so
+          desktop viewers don't need to scroll. */}
+      <div className="mx-auto w-full max-w-[360px]">
+        <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={storySrc}
+            alt={`${username} ${listMeta.title} IG Story share image`}
+            className="block w-full"
+            width={1080}
+            height={1920}
+          />
+        </div>
       </div>
 
-      {/* Hidden pre-warms for the IG Square and IG Story renders. The
-          browser fetches them in parallel with the page render; by the
-          time the user clicks Download, the CDN has them cached
-          (Cache-Control: s-maxage=300 on the API route) so the click is
-          instant. The download <a>s below point at the same URLs. */}
+      {/* Hidden pre-warms for the OG (used in link-preview metadata) and
+          IG Square sizes. The story preview above already triggers a
+          story render in the foreground. By the time the user clicks
+          any Download button, the CDN has cached all three sizes
+          (Cache-Control: s-maxage=300). */}
       <div aria-hidden="true" style={{ display: "none" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={squareSrc} alt="" width={1} height={1} />
+        <img src={ogSrc} alt="" width={1} height={1} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={storySrc} alt="" width={1} height={1} />
+        <img src={squareSrc} alt="" width={1} height={1} />
       </div>
 
       <section className="flex flex-col gap-3">
@@ -158,20 +159,20 @@ export default async function SharePage({ params }: { params: Params }) {
           For Instagram / TikTok where link previews don&apos;t work — download the PNG and upload it directly.
         </p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <a
+          <DownloadButton
             href={squareSrc}
-            download={`${username}-${list}-square.png`}
+            filename={`${username}-${list}-square.png`}
             className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
           >
             📸 IG Square (1080×1080)
-          </a>
-          <a
+          </DownloadButton>
+          <DownloadButton
             href={storySrc}
-            download={`${username}-${list}-story.png`}
+            filename={`${username}-${list}-story.png`}
             className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
           >
             📱 IG Story (1080×1920)
-          </a>
+          </DownloadButton>
         </div>
       </section>
     </main>
