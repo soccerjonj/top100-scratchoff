@@ -98,6 +98,22 @@ export default async function UserPage({
         </Link>
       </header>
 
+      {!hasCsv && (
+        <a
+          href="#csv-upload"
+          className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md border border-gold/40 bg-gold/5 px-3 py-2 text-xs transition hover:bg-gold/10 sm:text-sm"
+        >
+          <span className="text-zinc-300">
+            Showing your <strong className="text-gold">72 most recent</strong>{" "}
+            watches. Upload <code className="text-gold">watched.csv</code> from
+            Letterboxd for your full history.
+          </span>
+          <span className="rounded bg-gold px-3 py-1 font-semibold text-black">
+            Upload CSV ↓
+          </span>
+        </a>
+      )}
+
       <ListView
         activeList={activeList}
         watchedSlugs={user.watchedSlugs}
@@ -106,8 +122,11 @@ export default async function UserPage({
       />
 
       {/* Less-frequent actions live below the grid so they don't push posters off-screen on mobile */}
-      <footer className="mt-10 flex flex-col gap-3 border-t border-zinc-900 pt-6 text-xs">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-zinc-500">
+      <footer
+        id="csv-upload"
+        className="mt-10 flex flex-col gap-3 border-t border-zinc-900 pt-6 text-xs sm:flex-row sm:flex-wrap sm:items-start sm:gap-6"
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-zinc-500 sm:basis-full">
           <span>Last refreshed {timeAgo(new Date(user.lastScrapedAt))}</span>
           {hasCsv && (
             <span>
