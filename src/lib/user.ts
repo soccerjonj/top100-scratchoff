@@ -6,7 +6,11 @@ import {
 } from "@/lib/letterboxd";
 import type { UserRecord } from "@/types";
 
-const STALE_MS = 24 * 60 * 60 * 1000;
+// Each /u/[username] visit triggers a scrape if data is older than this.
+// Short enough that "another day, another visit" always gets fresh data;
+// long enough that tab-switching or revisiting within a session reuses
+// the cached scrape and doesn't hammer Letterboxd's rate limits.
+const STALE_MS = 30 * 60 * 1000;
 
 export function normalizeUsername(raw: string): string {
   return raw.trim().toLowerCase().replace(/^@/, "");

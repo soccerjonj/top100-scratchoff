@@ -39,7 +39,7 @@ A "scratch-off poster" web version of the IMDB Top 100 Fan Favorites and Letterb
 
 1. Push to a GitHub repo, import into Vercel.
 2. In Vercel project settings → Environment Variables, add `MONGODB_URI` and `CRON_SECRET`.
-3. The daily cron job is registered in [vercel.json](vercel.json) at `0 4 * * *` UTC.
+3. A monthly cron job is registered in [vercel.json](vercel.json) at `0 4 1 * *` UTC (1st of each month, 04:00 UTC) — see below.
 
 ## Routes
 
@@ -55,6 +55,9 @@ Letterboxd actively 403s server-side pagination on user `/films/` pages — we c
 
 1. On first visit, we scrape page 1 to seed the user's record with their ~72 most recent watches.
 2. The user uploads `watched.csv` (from Letterboxd → Settings → Import &amp; Export → Export Your Data) to backfill the full history.
-3. The daily cron (`0 4 * * *` UTC) re-scrapes page 1 for all known users and merges new slugs in. The CSV import never gets stale unless the user re-uploads.
+3. **Visit-triggered scrape**: every visit to `/u/[username]` (or `/together/...`) re-scrapes page 1 if the stored data is older than 30 minutes. Same-session activity (tab switches, etc.) reuses the cached scrape so we don't hammer Letterboxd's rate limits.
+4. **Monthly safety-net cron** (`0 4 1 * *` UTC, 1st of each month) re-scrapes every known user as a backstop for users who haven't visited recently. The cron is intentionally infrequent — for active users the on-visit refresh keeps things fresh on its own, and 72 most-recent watches covers ~28 days of watching for all but the most extreme cinephiles.
+
+In every case, the CSV import is never overwritten — incremental scrapes only union new slugs onto the existing set.
 
 The CSV file ships inside a `.zip`; users unzip it and upload just `watched.csv`. The parser reads the "Letterboxd URI" column and extracts canonical slugs.
