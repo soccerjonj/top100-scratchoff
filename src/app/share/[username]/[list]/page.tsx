@@ -62,8 +62,13 @@ export default async function SharePage({ params }: { params: Params }) {
 
   const apiBase = `/api/share-image/${username}/${list}`;
   const previewSrc = `${apiBase}?size=og`;
-  const squareDl = `${apiBase}?size=square&download=1`;
-  const storyDl = `${apiBase}?size=story&download=1`;
+  // Square + story URLs without ?download=1 so the hidden preload imgs
+  // below share the exact same URL as the download anchors — one CDN
+  // cache entry serves both. The HTML `download` attribute on the <a>
+  // tags handles the "save as" UX without needing the Content-Disposition
+  // detour.
+  const squareSrc = `${apiBase}?size=square`;
+  const storySrc = `${apiBase}?size=story`;
 
   // Share intent URLs need an absolute page URL; use a relative path that
   // the X/Threads share intents will accept (Twitter is fine with relative,
@@ -109,6 +114,18 @@ export default async function SharePage({ params }: { params: Params }) {
         />
       </div>
 
+      {/* Hidden pre-warms for the IG Square and IG Story renders. The
+          browser fetches them in parallel with the page render; by the
+          time the user clicks Download, the CDN has them cached
+          (Cache-Control: s-maxage=300 on the API route) so the click is
+          instant. The download <a>s below point at the same URLs. */}
+      <div aria-hidden="true" style={{ display: "none" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={squareSrc} alt="" width={1} height={1} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={storySrc} alt="" width={1} height={1} />
+      </div>
+
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
           Share
@@ -142,13 +159,15 @@ export default async function SharePage({ params }: { params: Params }) {
         </p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <a
-            href={squareDl}
+            href={squareSrc}
+            download={`${username}-${list}-square.png`}
             className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
           >
             📸 IG Square (1080×1080)
           </a>
           <a
-            href={storyDl}
+            href={storySrc}
+            download={`${username}-${list}-story.png`}
             className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
           >
             📱 IG Story (1080×1920)
