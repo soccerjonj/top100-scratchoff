@@ -6,7 +6,12 @@
 
 import type { ReactElement } from "react";
 import { LISTS } from "@/lib/lists";
-import { computeGridSpec, PosterGrid, pickTier } from "./grid";
+import {
+  computeGridSpec,
+  PosterGrid,
+  pickTier,
+  preferredColsFor,
+} from "./grid";
 import type { TemplateContext } from "./index";
 
 const SITE_URL = "top100scratchoff.com";
@@ -24,6 +29,7 @@ export async function renderTemplateCurrent(ctx: TemplateContext): Promise<{
     ctx.h - headerH - brandH,
     list.entries.length,
     4,
+    preferredColsFor(list.entries.length),
   );
   const tier = pickTier(spec.posterW);
   const watchedSet = new Set(ctx.watchedSlugs);

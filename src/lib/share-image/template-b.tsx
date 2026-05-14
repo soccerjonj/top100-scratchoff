@@ -9,7 +9,12 @@
 
 import type { ReactElement } from "react";
 import { LISTS } from "@/lib/lists";
-import { computeGridSpec, PosterGrid, pickTier } from "./grid";
+import {
+  computeGridSpec,
+  PosterGrid,
+  pickTier,
+  preferredColsFor,
+} from "./grid";
 import { loadFonts, type SatoriFont } from "./fonts";
 import type { TemplateContext } from "./index";
 
@@ -59,7 +64,13 @@ function layout(ctx: TemplateContext): ReactElement {
   const framePad = 14;
   const gridAvailW = ctx.w - padX * 2 - framePad * 2;
   const gridAvailH = middleH - padY - framePad * 2;
-  const spec = computeGridSpec(gridAvailW, gridAvailH, list.entries.length, 4);
+  const spec = computeGridSpec(
+    gridAvailW,
+    gridAvailH,
+    list.entries.length,
+    4,
+    preferredColsFor(list.entries.length),
+  );
   const tier = pickTier(spec.posterW);
   const watchedSet = new Set(ctx.watchedSlugs);
 

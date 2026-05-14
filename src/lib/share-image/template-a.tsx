@@ -14,7 +14,12 @@
 
 import type { ReactElement } from "react";
 import { LISTS } from "@/lib/lists";
-import { computeGridSpec, PosterGrid, pickTier } from "./grid";
+import {
+  computeGridSpec,
+  PosterGrid,
+  pickTier,
+  preferredColsFor,
+} from "./grid";
 import { loadFonts, type SatoriFont } from "./fonts";
 import type { TemplateContext } from "./index";
 
@@ -55,6 +60,7 @@ function horizontalLayout(ctx: TemplateContext): ReactElement {
     effH - gridPad * 2,
     list.entries.length,
     4,
+    preferredColsFor(list.entries.length),
   );
   const tier = pickTier(spec.posterW);
   const watchedSet = new Set(ctx.watchedSlugs);
@@ -88,6 +94,8 @@ function horizontalLayout(ctx: TemplateContext): ReactElement {
             width: rightW,
             height: effH,
             display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             padding: gridPad,
             borderLeft: "1px solid rgba(230,185,57,0.12)",
           }}
@@ -117,6 +125,7 @@ function verticalLayout(ctx: TemplateContext): ReactElement {
     gridH - gridPad * 2,
     list.entries.length,
     4,
+    preferredColsFor(list.entries.length),
   );
   const tier = pickTier(spec.posterW);
   const watchedSet = new Set(ctx.watchedSlugs);
@@ -152,6 +161,8 @@ function verticalLayout(ctx: TemplateContext): ReactElement {
             height: gridH,
             padding: gridPad,
             display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             borderTop: "1px solid rgba(230,185,57,0.12)",
           }}
         >

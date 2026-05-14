@@ -17,52 +17,89 @@ export interface GridSpec {
   gap: number;
 }
 
+/**
+ * `preferredCols`, if passed, is honored unconditionally. Use it when the
+ * total has an obvious clean factorisation (e.g. 100 → 10 cols × 10 rows,
+ * 500 → 25 × 20) so the bottom row isn't left with a single orphan poster.
+ */
 export function computeGridSpec(
   availW: number,
   availH: number,
   total: number,
   gap = 4,
+  preferredCols?: number,
 ): GridSpec {
-  // We track the best score, lower is better. Score considers aspect ratio
-  // distance from 2:3 *and* a heavy penalty for column counts that don't
-  // divide `total` evenly (which would leave a lonely partial last row).
-  let best: { cols: number; posterW: number; posterH: number; score: number } | null = null;
-  for (let cols = 6; cols <= 30; cols++) {
+  let chosen: { cols: number; posterW: number; posterH: number };
+
+  // Try preferred cols first, but only honor it if the resulting cells can
+  // hold a 2:3 poster aspect without overflowing the canvas. Otherwise the
+  // canvas would force squished landscape cells (common on horizontal OG)
+  // — fall back to aspect-search in that case.
+  const preferredFits = (() => {
+    if (!preferredCols || preferredCols <= 0) return null;
+    const cols = preferredCols;
     const rows = Math.ceil(total / cols);
     const posterW = (availW - (cols - 1) * gap) / cols;
-    const posterH = (availH - (rows - 1) * gap) / rows;
-    if (posterH <= 0 || posterW <= 0) continue;
-    const actualAspect = posterH / posterW;
-    const aspectDelta = Math.abs(actualAspect - 1.5);
-    const dividesEvenly = total % cols === 0;
-    const score =
-      aspectDelta +
-      (dividesEvenly ? 0 : 0.6) + // big bonus for clean rows
-      (posterW < 50 ? 0.5 : 0) +
-      (posterW < 30 ? 1 : 0);
-    if (!best || score < best.score) {
-      best = { cols, posterW, posterH, score };
+    const naturalH = posterW * 1.5;
+    const totalH = naturalH * rows + gap * (rows - 1);
+    if (totalH > availH) return null; // 2:3 won't fit
+    return { cols, posterW, posterH: naturalH };
+  })();
+
+  if (preferredFits) {
+    chosen = preferredFits;
+  } else {
+    let best: { cols: number; posterW: number; posterH: number; score: number } | null = null;
+    for (let cols = 6; cols <= 30; cols++) {
+      const rows = Math.ceil(total / cols);
+      const posterW = (availW - (cols - 1) * gap) / cols;
+      const posterH = (availH - (rows - 1) * gap) / rows;
+      if (posterH <= 0 || posterW <= 0) continue;
+      const actualAspect = posterH / posterW;
+      const aspectDelta = Math.abs(actualAspect - 1.5);
+      const dividesEvenly = total % cols === 0;
+      const score =
+        aspectDelta +
+        (dividesEvenly ? 0 : 0.6) +
+        (posterW < 50 ? 0.5 : 0) +
+        (posterW < 30 ? 1 : 0);
+      if (!best || score < best.score) {
+        best = { cols, posterW, posterH, score };
+      }
     }
+    if (!best) {
+      const cols = Math.ceil(Math.sqrt(total));
+      const rows = Math.ceil(total / cols);
+      best = {
+        cols,
+        posterW: availW / cols - gap,
+        posterH: availH / rows - gap,
+        score: 0,
+      };
+    }
+    chosen = best;
   }
-  if (!best) {
-    const cols = Math.ceil(Math.sqrt(total));
-    const rows = Math.ceil(total / cols);
-    best = {
-      cols,
-      posterW: availW / cols - gap,
-      posterH: availH / rows - gap,
-      score: 0,
-    };
-  }
-  const cellW = best.posterW;
-  const cellH = Math.min(best.posterH, cellW * 1.5);
+
+  // Respect the 2:3 poster aspect: cap the cell HEIGHT at width × 1.5 so
+  // the image isn't stretched vertically. If the algorithm gave us tall
+  // cells, we accept the empty space. We never grow the cell wider than
+  // available, so posters never spill out.
+  const cellW = chosen.posterW;
+  const cellH = Math.min(chosen.posterH, cellW * 1.5);
   return {
-    cols: best.cols,
+    cols: chosen.cols,
     posterW: Math.floor(cellW),
     posterH: Math.floor(cellH),
     rankFont: Math.max(10, Math.floor(cellW * 0.3)),
     gap,
   };
+}
+
+/** Sensible default preferred column counts for known list sizes. */
+export function preferredColsFor(total: number): number | undefined {
+  if (total === 100) return 10;
+  if (total === 500) return 25;
+  return undefined;
 }
 
 export function posterUrl(
@@ -120,14 +157,13 @@ export function PosterGrid({
               overflow: "hidden",
               borderRadius: radius,
               background: "#0a0907",
-              // Layered shadow:
-              //   1. Outer dark drop-shadow lifts watched off the page.
-              //   2. Outer gold glow halos them.
-              //   3. Thin gold ring is the "edge light."
-              // Unwatched get only a very faint inset stroke so they read
-              // as a flat panel beneath the watched plane.
+              // Watched cells: a clean dark drop-shadow lifts them off the
+              // background plus a hairline gold edge for definition. The
+              // earlier gold glow halo read as garish; dropped it. The
+              // visual hierarchy now comes from poster color/saturation
+              // contrast vs the dim foil-overlay unwatched.
               boxShadow: watched
-                ? "0 6px 14px rgba(0,0,0,0.55), 0 0 22px rgba(230,185,57,0.55), 0 0 0 1.5px rgba(230,185,57,0.9)"
+                ? "0 6px 16px rgba(0,0,0,0.7), 0 0 0 1px rgba(230,185,57,0.6)"
                 : "inset 0 0 0 1px rgba(0,0,0,0.55)",
             }}
           >
