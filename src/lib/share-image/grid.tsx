@@ -84,11 +84,12 @@ export function PosterGrid({
   watchedSet: Set<string>;
   spec: GridSpec;
   tier: string;
-  /** Container width (px). If passed, grid fills it. */
   width?: number;
-  /** Container height (px). */
   height?: number;
 }) {
+  // Corner radius scales with poster size — bigger cells get more rounding
+  // but the ratio stays subtle so it doesn't read as "rounded-rect UI."
+  const radius = Math.max(2, Math.round(spec.posterW * 0.04));
   return (
     <div
       style={{
@@ -112,12 +113,17 @@ export function PosterGrid({
               display: "flex",
               position: "relative",
               overflow: "hidden",
-              background: "#111",
-              transform: watched ? "scale(1.06)" : "scale(1)",
-              zIndex: watched ? 1 : 0,
+              borderRadius: radius,
+              background: "#0a0907",
+              // Layered shadow:
+              //   1. Outer dark drop-shadow lifts watched off the page.
+              //   2. Outer gold glow halos them.
+              //   3. Thin gold ring is the "edge light."
+              // Unwatched get only a very faint inset stroke so they read
+              // as a flat panel beneath the watched plane.
               boxShadow: watched
-                ? "inset 0 0 0 2px #d4af37, 0 0 14px rgba(212,175,55,0.55)"
-                : "inset 0 0 0 1px rgba(255,255,255,0.04)",
+                ? "0 6px 14px rgba(0,0,0,0.55), 0 0 22px rgba(230,185,57,0.55), 0 0 0 1.5px rgba(230,185,57,0.9)"
+                : "inset 0 0 0 1px rgba(0,0,0,0.55)",
             }}
           >
             {url ? (
@@ -132,9 +138,9 @@ export function PosterGrid({
                   height: "100%",
                   objectFit: "cover",
                   filter: watched
-                    ? "saturate(1.2) contrast(1.05)"
-                    : "grayscale(100%) brightness(0.3)",
-                  opacity: watched ? 1 : 0.38,
+                    ? "saturate(1.25) contrast(1.08)"
+                    : "grayscale(100%) brightness(0.26)",
+                  opacity: watched ? 1 : 0.42,
                 }}
               />
             ) : (
@@ -142,16 +148,42 @@ export function PosterGrid({
                 style={{
                   width: "100%",
                   height: "100%",
-                  background: watched ? "#222" : "#0b0b0f",
+                  background: watched ? "#1a1612" : "#070605",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: watched ? "#d4af37" : "#333",
+                  color: watched ? "#e6b939" : "#3a3530",
                   fontSize: spec.rankFont * 0.6,
                 }}
               >
                 #{entry.rank}
               </div>
+            )}
+
+            {/* Scratch-off foil overlay on unwatched cells. Subtle diagonal
+                gold sheen evokes the physical scratch-card surface that
+                inspired the site. */}
+            {!watched && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(135deg, rgba(230,185,57,0.18) 0%, rgba(20,15,8,0.45) 45%, rgba(20,15,8,0.6) 60%, rgba(230,185,57,0.14) 100%)",
+                }}
+              />
+            )}
+
+            {/* Subtle highlight on watched cells (top-left light catch) */}
+            {watched && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 35%)",
+                }}
+              />
             )}
           </div>
         );
