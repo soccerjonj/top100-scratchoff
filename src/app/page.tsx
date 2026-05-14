@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { UsernameForm } from "@/components/UsernameForm";
 
 export default function HomePage() {
@@ -15,6 +16,17 @@ export default function HomePage() {
       <p className="text-xs text-zinc-600">
         Your username is public. We scrape your public /films page only.
       </p>
+      <div className="border-t border-zinc-900 pt-6 text-sm">
+        <p className="text-zinc-500">
+          Don&apos;t have Letterboxd?{" "}
+          <Link
+            href="/no-letterboxd"
+            className="font-semibold text-gold underline-offset-2 hover:underline"
+          >
+            Track films manually →
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

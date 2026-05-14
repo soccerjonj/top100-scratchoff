@@ -147,6 +147,7 @@ export async function ensureGuestUser(username: string): Promise<UserRecord> {
         createdAt: now,
         manualWatched: [],
         manualUnwatched: [],
+        isGuest: true,
       },
     },
     { upsert: true },
@@ -177,6 +178,8 @@ export async function getOrRefreshUser(username: string): Promise<UserRecord> {
   const cleanName = normalizeUsername(username);
   const existing = await getUser(cleanName);
   if (existing) {
+    // Guest records have no Letterboxd profile — skip all scrape attempts.
+    if (existing.isGuest) return existing;
     if (Date.now() - new Date(existing.lastScrapedAt).getTime() < STALE_MS) {
       return existing;
     }

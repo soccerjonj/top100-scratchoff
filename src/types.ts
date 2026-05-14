@@ -37,6 +37,12 @@ export interface UserRecord {
    * Letterboxd entry without re-importing.
    */
   manualUnwatched?: string[];
+  /**
+   * Marks a record created for someone without a Letterboxd account.
+   * Skip all scrape attempts for guest users — they exist purely so
+   * the manual-watch toggle works.
+   */
+  isGuest?: boolean;
 }
 
 /** Compute the effective watched slug set, applying manual overrides. */
