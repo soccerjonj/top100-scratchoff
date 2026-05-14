@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import type { FilmEntry } from "@/types";
 import { posterUrl } from "@/lib/tmdb";
@@ -21,16 +22,31 @@ export function PosterCard({
   entry,
   watched,
   listTitle,
+  ownerUsername,
 }: {
   entry: FilmEntry;
   watched: boolean;
   listTitle?: string;
+  /**
+   * The username whose grid is being viewed. Required for manual-watch
+   * toggling — without it (e.g. on /together views with multiple users)
+   * the toggle is hidden.
+   */
+  ownerUsername?: string;
 }) {
+  const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [details, setDetails] = useState<MovieDetails | null>(null);
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">(
     "idle",
   );
+  // Optimistic state for the manual toggle — flips immediately on click,
+  // then router.refresh() pulls the real state from Mongo.
+  const [optimisticWatched, setOptimisticWatched] = useState<boolean | null>(
+    null,
+  );
+  const [toggling, setToggling] = useState(false);
+  const effectiveWatched = optimisticWatched ?? watched;
 
   async function openDialog() {
     const d = dialogRef.current;
@@ -82,6 +98,33 @@ export function PosterCard({
   const bigPosterSrc = entry.posterPath
     ? `https://image.tmdb.org/t/p/w500${entry.posterPath}`
     : null;
+
+  async function toggleManualWatched() {
+    if (!ownerUsername || toggling) return;
+    const next = !effectiveWatched;
+    setOptimisticWatched(next);
+    setToggling(true);
+    try {
+      const res = await fetch(
+        `/api/user/${ownerUsername}/manual-watch`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: entry.letterboxdSlug, watched: next }),
+        },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Background refresh: tells the route segment to re-render with the
+      // updated Mongo data. The optimistic state stays until the page
+      // re-renders with the real watched prop.
+      router.refresh();
+    } catch (err) {
+      console.error("manual-watch toggle failed", err);
+      setOptimisticWatched(null); // revert
+    } finally {
+      setToggling(false);
+    }
+  }
 
   return (
     <>
@@ -175,14 +218,36 @@ export function PosterCard({
               </button>
             </div>
 
-            {watched ? (
-              <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold">
-                ✨ Watched
-              </div>
-            ) : (
-              <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
-                Not watched yet
-              </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {effectiveWatched ? (
+                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold">
+                  ✨ Watched
+                </div>
+              ) : (
+                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
+                  Not watched yet
+                </div>
+              )}
+              {ownerUsername && (
+                <button
+                  type="button"
+                  onClick={toggleManualWatched}
+                  disabled={toggling}
+                  className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400 transition hover:border-gold/50 hover:text-gold disabled:opacity-50"
+                >
+                  {toggling
+                    ? "Saving…"
+                    : effectiveWatched
+                      ? "Mark unwatched"
+                      : "✓ Mark watched"}
+                </button>
+              )}
+            </div>
+            {ownerUsername && !watched && optimisticWatched === null && (
+              <p className="text-[10px] text-zinc-600">
+                Manual marks save to your record — useful if you don&apos;t use
+                Letterboxd or it&apos;s missing from your export.
+              </p>
             )}
 
             {details?.tagline && (

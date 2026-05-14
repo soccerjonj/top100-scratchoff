@@ -7,6 +7,7 @@ import { ListView } from "@/components/ListView";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
 import type { ListId } from "@/types";
+import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,8 @@ export default async function UserPage({
 
   const hasCsv = user.csvUploadedAt != null;
   const preloadHref = `/api/share-image/${username}/${activeList}?size=og`;
+  // Apply manual overrides on top of scraped/CSV slugs.
+  const effectiveWatched = Array.from(effectiveWatchedSet(user));
 
   return (
     <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
@@ -116,9 +119,10 @@ export default async function UserPage({
 
       <ListView
         activeList={activeList}
-        watchedSlugs={user.watchedSlugs}
+        watchedSlugs={effectiveWatched}
         username={username}
         density={density}
+        ownerUsername={username}
       />
 
       {/* Less-frequent actions live below the grid so they don't push posters off-screen on mobile */}

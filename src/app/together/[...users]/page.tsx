@@ -4,6 +4,7 @@ import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListView } from "@/components/ListView";
 import type { ListId, UserRecord } from "@/types";
+import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +69,7 @@ export default async function TogetherPage({
     }
   }
 
-  const sets = records.map((r) => new Set(r.watchedSlugs));
+  const sets = records.map((r) => effectiveWatchedSet(r));
   const slugs = mode === "both" ? intersect(sets) : union(sets);
   const headline = mode === "both" ? "both watched" : "either watched";
 

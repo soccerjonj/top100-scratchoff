@@ -76,7 +76,86 @@ export async function mergeSlugs(
       source === "csv" ? now : (existing?.csvUploadedAt ?? null),
     lastScrapedAt: now,
     createdAt: existing?.createdAt ?? now,
+    manualWatched: existing?.manualWatched ?? [],
+    manualUnwatched: existing?.manualUnwatched ?? [],
   };
+}
+
+/**
+ * Toggle a slug in the user's manual watched/unwatched override sets.
+ * The new state is applied as a delta: if the slug is already in one
+ * override list, it's moved/removed appropriately.
+ *
+ * Returns the updated record so the API route can echo back the
+ * resulting state to the client.
+ */
+export async function setManualWatchedState(
+  username: string,
+  slug: string,
+  watched: boolean,
+): Promise<UserRecord | null> {
+  const cleanName = normalizeUsername(username);
+  if (!/^[a-z0-9_-]+$/.test(cleanName)) return null;
+  const col = await getUsersCollection();
+  const existing = await col.findOne({ username: cleanName });
+  if (!existing) return null;
+
+  const inAuto = existing.watchedSlugs.includes(slug);
+  const manualWatched = new Set(existing.manualWatched ?? []);
+  const manualUnwatched = new Set(existing.manualUnwatched ?? []);
+
+  if (watched) {
+    // Want it watched.
+    manualUnwatched.delete(slug);
+    if (!inAuto) manualWatched.add(slug);
+    else manualWatched.delete(slug); // auto already covers it
+  } else {
+    // Want it unwatched.
+    manualWatched.delete(slug);
+    if (inAuto) manualUnwatched.add(slug);
+    else manualUnwatched.delete(slug); // never was watched
+  }
+
+  const update = {
+    manualWatched: Array.from(manualWatched).sort(),
+    manualUnwatched: Array.from(manualUnwatched).sort(),
+  };
+  await col.updateOne({ username: cleanName }, { $set: update });
+
+  return { ...existing, ...update } as UserRecord;
+}
+
+/**
+ * Create a minimal "guest" user record for someone without a Letterboxd
+ * profile. Manual-tracking only — no scrape data, no CSV. The username
+ * just acts as a unique key; if the Letterboxd profile later starts
+ * existing, the same record gets enriched via scrape.
+ */
+export async function ensureGuestUser(username: string): Promise<UserRecord> {
+  const cleanName = normalizeUsername(username);
+  const col = await getUsersCollection();
+  const now = new Date();
+  await col.updateOne(
+    { username: cleanName },
+    {
+      $setOnInsert: {
+        username: cleanName,
+        watchedSlugs: [],
+        filmCount: 0,
+        csvUploadedAt: null,
+        lastScrapedAt: now,
+        createdAt: now,
+        manualWatched: [],
+        manualUnwatched: [],
+      },
+    },
+    { upsert: true },
+  );
+  const found = await col.findOne(
+    { username: cleanName },
+    { projection: { _id: 0 } },
+  );
+  return found!;
 }
 
 /**

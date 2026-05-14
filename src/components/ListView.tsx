@@ -12,6 +12,7 @@ export function ListView({
   basePath,
   density = "dense",
   extraParams = {},
+  ownerUsername,
 }: {
   activeList: ListId;
   watchedSlugs: string[];
@@ -20,6 +21,8 @@ export function ListView({
   density?: Density;
   /** Extra search params to preserve on tab/toggle links (e.g. mode= on /together). */
   extraParams?: Record<string, string>;
+  /** Single-user views pass this so the per-movie dialog gets a manual-watch toggle. */
+  ownerUsername?: string;
 }) {
   const list = LISTS[activeList];
   const watchedSet = new Set(watchedSlugs);
@@ -35,18 +38,31 @@ export function ListView({
         <div className="flex-1 min-w-[240px]">
           <ProgressBar watched={watchedInList} total={list.entries.length} />
         </div>
-        <DensityToggle
-          density={density}
-          basePath={tabsBase}
-          activeList={activeList}
-          extraParams={extraParams}
-        />
+        <div className="flex items-center gap-3">
+          {list.sourceUrl && (
+            <a
+              href={list.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-zinc-500 underline-offset-2 hover:text-gold hover:underline"
+            >
+              {list.sourceLabel ?? "View on Letterboxd"} ↗
+            </a>
+          )}
+          <DensityToggle
+            density={density}
+            basePath={tabsBase}
+            activeList={activeList}
+            extraParams={extraParams}
+          />
+        </div>
       </div>
       <PosterGrid
         entries={list.entries}
         watchedSet={watchedSet}
         density={density}
         listTitle={list.title}
+        ownerUsername={ownerUsername}
       />
     </div>
   );
