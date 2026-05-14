@@ -32,7 +32,10 @@ export function UsernameForm() {
     setError(null);
     setLoading(true);
     if (names.length === 1) {
-      router.push(`/u/${names[0]}`);
+      // First-stop is /setup/[name] — it verifies the Letterboxd profile,
+      // shows export instructions if no CSV yet, and redirects straight
+      // to /u/[name] for returning users who already uploaded.
+      router.push(`/setup/${names[0]}`);
     } else {
       router.push(`/together/${names.join("/")}`);
     }

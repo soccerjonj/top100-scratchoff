@@ -6,13 +6,23 @@ import { useRef, useState, type FormEvent } from "react";
 export function CsvUpload({
   username,
   hasCsv,
+  variant = "collapsed",
+  redirectTo,
 }: {
   username: string;
   hasCsv: boolean;
+  /**
+   * "collapsed" (default): starts as a small button, expands the form on click.
+   * "expanded": form is rendered inline immediately (for onboarding pages
+   * where uploading is the whole point).
+   */
+  variant?: "collapsed" | "expanded";
+  /** Path to navigate to after a successful upload. Defaults to refresh. */
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(variant === "expanded");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
@@ -36,8 +46,13 @@ export function CsvUpload({
       if (!res.ok) {
         setError(json.error ?? "upload failed");
       } else {
-        setOkMsg(`Imported ${json.filmCount} films.`);
-        router.refresh();
+        setOkMsg(`Imported ${json.totalWatched ?? json.filmCount} films.`);
+        if (redirectTo) {
+          router.push(redirectTo);
+          router.refresh();
+        } else {
+          router.refresh();
+        }
       }
     } catch {
       setError("upload failed");
@@ -66,32 +81,13 @@ export function CsvUpload({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-2 rounded-md border border-zinc-800 bg-zinc-900/50 p-3 text-sm"
+      className="flex flex-col gap-3 rounded-md border border-zinc-800 bg-zinc-900/50 p-4 text-sm"
     >
-      <div className="text-zinc-400">
-        Letterboxd blocks server-side pagination, so we can only see your last{" "}
-        ~72 films via scraping. To backfill your full history:
-        <ol className="ml-5 mt-2 list-decimal text-xs text-zinc-500">
-          <li>
-            Open{" "}
-            <a
-              href="https://letterboxd.com/settings/data/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-gold underline"
-            >
-              Letterboxd → Settings → Import &amp; Export
-            </a>
-          </li>
-          <li>Click <em>Export Your Data</em>, download the zip</li>
-          <li>Unzip and upload <code>watched.csv</code> below</li>
-        </ol>
-      </div>
       <input
         ref={fileRef}
         type="file"
         accept=".csv,text/csv"
-        className="text-xs file:mr-2 file:rounded file:border-0 file:bg-gold file:px-2 file:py-1 file:text-black"
+        className="text-xs file:mr-2 file:rounded file:border-0 file:bg-gold file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-black"
       />
       {error && <div className="text-xs text-red-400">{error}</div>}
       {okMsg && <div className="text-xs text-green-400">{okMsg}</div>}
@@ -99,17 +95,19 @@ export function CsvUpload({
         <button
           type="submit"
           disabled={busy}
-          className="rounded-md bg-gold px-3 py-1 text-xs font-semibold text-black disabled:opacity-50"
+          className="rounded-md bg-gold px-4 py-2 text-sm font-semibold text-black hover:bg-gold-dim disabled:opacity-50"
         >
-          {busy ? "Importing…" : "Import"}
+          {busy ? "Importing…" : "Import watched.csv"}
         </button>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="rounded-md border border-zinc-700 px-3 py-1 text-xs text-zinc-400"
-        >
-          Cancel
-        </button>
+        {variant === "collapsed" && (
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-400"
+          >
+            Cancel
+          </button>
+        )}
       </div>
     </form>
   );
