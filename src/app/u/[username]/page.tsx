@@ -73,45 +73,30 @@ export default async function UserPage({
   }
 
   const hasCsv = user.csvUploadedAt != null;
-
-  // Pre-warm the share image for the currently-active list so the CDN
-  // has it cached by the time the user clicks "Share". The browser will
-  // fetch this in parallel with the page render.
   const preloadHref = `/api/share-image/${username}/${activeList}?size=og`;
 
   return (
-    <main className="mx-auto max-w-[1800px] px-4 py-8">
+    <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
       <link rel="preload" as="image" href={preloadHref} />
-      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">
+
+      {/* Compact top row: identity + primary action (Share) */}
+      <header className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold sm:text-2xl">
             <span className="text-gold">{username}</span>
           </h1>
-          <p className="text-sm text-zinc-500">
-            {user.filmCount.toLocaleString()} films watched · last refreshed{" "}
-            {timeAgo(new Date(user.lastScrapedAt))}
-            {hasCsv && (
-              <>
-                {" "}· CSV imported {timeAgo(new Date(user.csvUploadedAt!))}
-              </>
-            )}
+          <p className="truncate text-xs text-zinc-500 sm:text-sm">
+            {user.filmCount.toLocaleString()} films watched
+            {hasCsv ? "" : " · page 1 only"}
           </p>
         </div>
-        <Link href="/" className="text-sm text-zinc-400 hover:text-gold">
-          ← change user
-        </Link>
-      </header>
-
-      <div className="mb-6 flex flex-col gap-3">
-        <CsvUpload username={username} hasCsv={hasCsv} />
-        <ComparePartnerForm self={username} />
         <Link
           href={`/share/${username}/${activeList}`}
-          className="self-start rounded-md border border-gold bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold hover:bg-gold/20"
+          className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
         >
-          ✨ Share this list →
+          ✨ Share
         </Link>
-      </div>
+      </header>
 
       <ListView
         activeList={activeList}
@@ -119,6 +104,24 @@ export default async function UserPage({
         username={username}
         density={density}
       />
+
+      {/* Less-frequent actions live below the grid so they don't push posters off-screen on mobile */}
+      <footer className="mt-10 flex flex-col gap-3 border-t border-zinc-900 pt-6 text-xs">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-zinc-500">
+          <span>Last refreshed {timeAgo(new Date(user.lastScrapedAt))}</span>
+          {hasCsv && (
+            <span>
+              · CSV imported {timeAgo(new Date(user.csvUploadedAt!))}
+            </span>
+          )}
+          <span className="grow" />
+          <Link href="/" className="text-zinc-400 hover:text-gold">
+            ← change user
+          </Link>
+        </div>
+        <CsvUpload username={username} hasCsv={hasCsv} />
+        <ComparePartnerForm self={username} />
+      </footer>
     </main>
   );
 }

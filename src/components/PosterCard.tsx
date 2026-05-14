@@ -28,7 +28,7 @@ export function PosterCard({
         className="object-cover"
         unoptimized={!entry.posterPath}
       />
-      <div className="absolute left-1 top-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-gold">
+      <div className="absolute left-0.5 top-0.5 rounded bg-black/70 px-1 py-0 text-[8px] font-semibold text-gold sm:left-1 sm:top-1 sm:px-1.5 sm:py-0.5 sm:text-[10px]">
         #{entry.rank}
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">

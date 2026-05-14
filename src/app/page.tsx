@@ -8,7 +8,8 @@ export default function HomePage() {
       </h1>
       <p className="max-w-md text-balance text-zinc-400">
         Enter your Letterboxd username to reveal which films you&apos;ve watched
-        from the IMDB Top 100 and Letterboxd Top 500. Updated daily.
+        from the IMDB Top 100, AFI 100, NYT 21st-Century 100, and Letterboxd
+        Top 500. Updated daily.
       </p>
       <UsernameForm />
       <p className="text-xs text-zinc-600">

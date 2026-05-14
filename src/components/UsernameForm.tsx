@@ -47,7 +47,7 @@ export function UsernameForm() {
           name="username"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="username (or two, separated by a comma)"
+          placeholder="username"
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}

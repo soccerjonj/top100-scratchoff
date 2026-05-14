@@ -9,6 +9,13 @@ const ORDER: ListId[] = [
   "letterboxd-top-500",
 ];
 
+const SHORT_TITLE: Record<ListId, string> = {
+  "imdb-top-100": "IMDB 100",
+  "afi-top-100": "AFI 100",
+  "nyt-top-100": "NYT 21st",
+  "letterboxd-top-500": "Letterboxd 500",
+};
+
 export function ListTabs({
   active,
   basePath,
@@ -25,7 +32,7 @@ export function ListTabs({
     return `${basePath}?${params.toString()}`;
   };
   return (
-    <nav className="flex flex-wrap gap-2 border-b border-zinc-800 pb-2">
+    <nav className="-mx-4 flex gap-2 overflow-x-auto whitespace-nowrap border-b border-zinc-800 px-4 pb-2 sm:flex-wrap sm:overflow-visible">
       {ORDER.map((id) => {
         const isActive = id === active;
         return (
@@ -34,13 +41,14 @@ export function ListTabs({
             href={make(id)}
             scroll={false}
             className={[
-              "rounded-full border px-4 py-1.5 text-sm transition",
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs transition sm:px-4 sm:text-sm",
               isActive
                 ? "border-gold bg-gold/10 text-gold"
                 : "border-zinc-700 text-zinc-400 hover:border-gold/50 hover:text-gold/80",
             ].join(" ")}
           >
-            {LISTS[id].title}
+            <span className="sm:hidden">{SHORT_TITLE[id]}</span>
+            <span className="hidden sm:inline">{LISTS[id].title}</span>
           </Link>
         );
       })}
