@@ -126,6 +126,45 @@ export async function setManualWatchedState(
 }
 
 /**
+ * Convert a guest record into a real Letterboxd-tied record. Used when a
+ * real Letterboxd user finds their preferred nickname has been claimed by
+ * a guest and wants to take it over.
+ *
+ * Behaviour:
+ *  - Verifies the Letterboxd profile actually exists
+ *  - Wipes the guest's manual marks (the guest is someone else)
+ *  - Flips isGuest off, runs a fresh scrape
+ *  - Throws LetterboxdNotFoundError if there's no real profile at that name
+ *  - Returns null if no guest record exists to claim
+ */
+export async function claimGuestAsLetterboxd(
+  username: string,
+): Promise<UserRecord | null> {
+  const cleanName = normalizeUsername(username);
+  const col = await getUsersCollection();
+  const existing = await col.findOne({ username: cleanName });
+  if (!existing || !existing.isGuest) return null;
+
+  // Verify a real Letterboxd account exists at this name. Throws if not.
+  const exists = await letterboxdUserExists(cleanName);
+  if (!exists) throw new LetterboxdNotFoundError(cleanName);
+
+  await col.updateOne(
+    { username: cleanName },
+    {
+      $set: {
+        isGuest: false,
+        manualWatched: [],
+        manualUnwatched: [],
+      },
+    },
+  );
+
+  // Seed with a fresh scrape so the new owner sees their real recent watches.
+  return refreshUserFromScrape(cleanName);
+}
+
+/**
  * Create a minimal "guest" user record for someone without a Letterboxd
  * profile. Manual-tracking only — no scrape data, no CSV. The username
  * just acts as a unique key; if the Letterboxd profile later starts

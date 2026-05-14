@@ -1,8 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
-import { LetterboxdNotFoundError } from "@/lib/letterboxd";
+import { getOrRefreshUser, getUser, normalizeUsername } from "@/lib/user";
+import {
+  LetterboxdNotFoundError,
+  letterboxdUserExists,
+} from "@/lib/letterboxd";
 import { CsvUpload } from "@/components/CsvUpload";
+import { ClaimGuestButton } from "./ClaimGuestButton";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +16,19 @@ export default async function SetupPage({ params }: { params: Params }) {
   const { username: raw } = await params;
   const username = normalizeUsername(raw);
   if (!/^[a-z0-9_-]+$/.test(username)) notFound();
+
+  // Collision case: a guest claimed this nickname earlier. If a real
+  // Letterboxd profile now exists at the same name, offer a takeover.
+  // Otherwise the guest keeps using the manual-tracking flow at /u/.
+  const preExisting = await getUser(username);
+  if (preExisting?.isGuest) {
+    const realLbProfile = await letterboxdUserExists(username);
+    if (realLbProfile) {
+      return <TakeoverScreen username={username} />;
+    }
+    // Just a guest — let them through to their own grid.
+    redirect(`/u/${username}`);
+  }
 
   // Verify the Letterboxd profile exists + seed a record. If they've
   // already uploaded a CSV, skip the onboarding entirely.
@@ -143,5 +160,57 @@ function Step({
         <div className="text-sm text-zinc-400">{body}</div>
       </div>
     </li>
+  );
+}
+
+function TakeoverScreen({ username }: { username: string }) {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-xl flex-col gap-6 px-4 py-10">
+      <Link href="/" className="text-xs text-zinc-500 hover:text-gold">
+        ← change user
+      </Link>
+      <header className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Heads up about <span className="text-gold">{username}</span>
+        </h1>
+        <p className="text-sm text-zinc-400">
+          Someone else already created a guest profile with this nickname
+          (and never connected it to Letterboxd). Since{" "}
+          <code className="text-gold">letterboxd.com/{username}</code> is a
+          real account, if that&apos;s you, you can claim this nickname now.
+        </p>
+      </header>
+
+      <div className="flex flex-col gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+        <p className="text-zinc-300">
+          <strong className="text-amber-400">Claiming will:</strong>
+        </p>
+        <ul className="ml-5 list-disc text-xs text-zinc-400">
+          <li>
+            Convert this profile to your real Letterboxd account
+          </li>
+          <li>
+            Wipe any manual &ldquo;watched&rdquo; marks the guest added
+            (they aren&apos;t yours)
+          </li>
+          <li>
+            Scrape your last ~72 Letterboxd watches as a starting point
+          </li>
+        </ul>
+      </div>
+
+      <ClaimGuestButton username={username} />
+
+      <p className="text-xs text-zinc-500">
+        Not you?{" "}
+        <Link
+          href="/"
+          className="text-zinc-400 underline-offset-2 hover:text-gold hover:underline"
+        >
+          Pick a different username
+        </Link>
+        . The current guest will keep using this nickname.
+      </p>
+    </main>
   );
 }
