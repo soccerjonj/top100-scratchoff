@@ -6,6 +6,7 @@ import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import type { ListId } from "@/types";
 import { DownloadButton } from "@/components/DownloadButton";
+import { PreviewWithProgress } from "@/components/PreviewWithProgress";
 
 export const dynamic = "force-dynamic";
 
@@ -101,16 +102,17 @@ export default async function SharePage({ params }: { params: Params }) {
 
       {/* Visible preview is the IG Story (1080×1920) since that's the
           most common share target. Scaled down to a portrait frame so
-          desktop viewers don't need to scroll. */}
+          desktop viewers don't need to scroll. PreviewWithProgress
+          shows an animated % overlay until the image actually loads so
+          users don't think the page is broken during the first render. */}
       <div className="mx-auto w-full max-w-[360px]">
         <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <PreviewWithProgress
             src={storySrc}
             alt={`${username} ${listMeta.title} IG Story share image`}
-            className="block w-full"
             width={1080}
             height={1920}
+            className="block w-full"
           />
         </div>
       </div>
