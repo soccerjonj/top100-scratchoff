@@ -51,7 +51,7 @@ export interface TemplateContext extends CanvasSize {
 
 export async function renderShareImage({
   size,
-  template = "current",
+  template = "a",
   listId,
   watchedSlugs,
   username,

@@ -2,9 +2,11 @@
  * Template A — "Editorial magazine cover."
  *
  * Asymmetric composition. Left column carries the editorial copy and a
- * hero percentage. Right column carries the poster grid as a framed
- * "filmstrip" element. Inter Display (geometric sans) for type. Subtle
- * radial vignette for depth.
+ * hero percentage typeset in Archivo Black (a heavy display sans for
+ * the brag); supporting copy is Inter. Right column carries the poster
+ * grid as a framed "filmstrip" element. Subtle radial vignette for
+ * depth. Inset stage margin so the design isn't pressed against the
+ * canvas edge.
  *
  * For square / story sizes, the columns become stacked rows (top hero,
  * bottom grid).
@@ -22,6 +24,8 @@ const GOLD_DIM = "#8c7426";
 const TEXT = "#f4eee5";
 const TEXT_MUTED = "#8c8478";
 
+const STAGE = 18; // inset from the canvas edge for breathing room
+
 export async function renderTemplateA(ctx: TemplateContext): Promise<{
   element: ReactElement;
   fonts: SatoriFont[];
@@ -29,23 +33,26 @@ export async function renderTemplateA(ctx: TemplateContext): Promise<{
   const fonts = await loadFonts([
     { family: "Inter", weight: 400 },
     { family: "Inter", weight: 700 },
-    { family: "Inter", weight: 900 },
+    // Archivo Black is a heavy display sans with character — better for
+    // the hero percentage than Inter 900 which still reads "UI."
+    { family: "Archivo Black", weight: 400, as: "ArchivoBlack" },
   ]);
 
-  const isHorizontal = ctx.w > ctx.h; // og
-  if (isHorizontal) return { element: horizontalLayout(ctx), fonts };
-  return { element: verticalLayout(ctx), fonts };
+  const isHorizontal = ctx.w > ctx.h;
+  const element = isHorizontal ? horizontalLayout(ctx) : verticalLayout(ctx);
+  return { element, fonts };
 }
 
 function horizontalLayout(ctx: TemplateContext): ReactElement {
-  // OG 1200×630: split into 38% / 62%
-  const leftW = Math.round(ctx.w * 0.38);
-  const rightW = ctx.w - leftW;
+  const effW = ctx.w - STAGE * 2;
+  const effH = ctx.h - STAGE * 2;
+  const leftW = Math.round(effW * 0.38);
+  const rightW = effW - leftW;
   const list = LISTS[ctx.listId];
-  const gridPad = 30;
+  const gridPad = 26;
   const spec = computeGridSpec(
     rightW - gridPad * 2,
-    ctx.h - gridPad * 2,
+    effH - gridPad * 2,
     list.entries.length,
     4,
   );
@@ -59,42 +66,54 @@ function horizontalLayout(ctx: TemplateContext): ReactElement {
         height: ctx.h,
         display: "flex",
         background: BG,
+        padding: STAGE,
+        position: "relative",
         color: TEXT,
         fontFamily: "Inter",
-        position: "relative",
       }}
     >
       <Vignette />
-      <LeftEditorial ctx={ctx} width={leftW} />
       <div
         style={{
-          width: rightW,
-          height: ctx.h,
+          width: effW,
+          height: effH,
           display: "flex",
-          padding: gridPad,
-          borderLeft: "1px solid rgba(230,185,57,0.12)",
+          position: "relative",
+          boxShadow: "inset 0 0 0 1px rgba(230,185,57,0.14)",
         }}
       >
-        <PosterGrid
-          entries={list.entries}
-          watchedSet={watchedSet}
-          spec={spec}
-          tier={tier}
-        />
+        <LeftEditorial ctx={ctx} width={leftW} height={effH} />
+        <div
+          style={{
+            width: rightW,
+            height: effH,
+            display: "flex",
+            padding: gridPad,
+            borderLeft: "1px solid rgba(230,185,57,0.12)",
+          }}
+        >
+          <PosterGrid
+            entries={list.entries}
+            watchedSet={watchedSet}
+            spec={spec}
+            tier={tier}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
 function verticalLayout(ctx: TemplateContext): ReactElement {
-  // square / story: top hero band, bottom grid
+  const effW = ctx.w - STAGE * 2;
+  const effH = ctx.h - STAGE * 2;
   const isStory = ctx.h > ctx.w * 1.5;
-  const heroH = isStory ? Math.round(ctx.h * 0.32) : Math.round(ctx.h * 0.38);
-  const gridH = ctx.h - heroH;
-  const gridPad = ctx.w >= 1080 ? 50 : 30;
+  const heroH = isStory ? Math.round(effH * 0.32) : Math.round(effH * 0.38);
+  const gridH = effH - heroH;
+  const gridPad = ctx.w >= 1080 ? 40 : 26;
   const list = LISTS[ctx.listId];
   const spec = computeGridSpec(
-    ctx.w - gridPad * 2,
+    effW - gridPad * 2,
     gridH - gridPad * 2,
     list.entries.length,
     4,
@@ -110,41 +129,52 @@ function verticalLayout(ctx: TemplateContext): ReactElement {
         display: "flex",
         flexDirection: "column",
         background: BG,
+        padding: STAGE,
+        position: "relative",
         color: TEXT,
         fontFamily: "Inter",
-        position: "relative",
       }}
     >
       <Vignette />
-      <TopEditorial ctx={ctx} height={heroH} />
       <div
         style={{
-          height: gridH,
-          padding: gridPad,
+          width: effW,
+          height: effH,
           display: "flex",
-          borderTop: "1px solid rgba(230,185,57,0.12)",
+          flexDirection: "column",
+          position: "relative",
+          boxShadow: "inset 0 0 0 1px rgba(230,185,57,0.14)",
         }}
       >
-        <PosterGrid
-          entries={list.entries}
-          watchedSet={watchedSet}
-          spec={spec}
-          tier={tier}
-        />
+        <TopEditorial ctx={ctx} height={heroH} width={effW} />
+        <div
+          style={{
+            height: gridH,
+            padding: gridPad,
+            display: "flex",
+            borderTop: "1px solid rgba(230,185,57,0.12)",
+          }}
+        >
+          <PosterGrid
+            entries={list.entries}
+            watchedSet={watchedSet}
+            spec={spec}
+            tier={tier}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
 function Vignette() {
-  // Subtle radial gradient to give the background depth without distracting
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(circle at 30% 50%, rgba(230,185,57,0.06) 0%, rgba(0,0,0,0) 55%), radial-gradient(circle at 100% 100%, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 60%)",
+          "radial-gradient(circle at 30% 50%, rgba(230,185,57,0.07) 0%, rgba(0,0,0,0) 55%), radial-gradient(circle at 100% 100%, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%)",
       }}
     />
   );
@@ -153,41 +183,39 @@ function Vignette() {
 function LeftEditorial({
   ctx,
   width,
+  height,
 }: {
   ctx: TemplateContext;
   width: number;
+  height: number;
 }) {
-  // For 1200×630 horizontal layout
-  const pad = 48;
+  const pad = 42;
   return (
     <div
       style={{
         width,
-        height: ctx.h,
+        height,
         padding: `${pad}px ${pad}px`,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
       }}
     >
-      {/* Top: small wordmark */}
+      {/* Top: small wordmark in Archivo Black */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 8,
+          gap: 10,
           fontSize: 14,
           color: GOLD,
-          letterSpacing: 4,
-          fontWeight: 700,
-          textTransform: "uppercase",
+          letterSpacing: 3,
+          fontFamily: "ArchivoBlack",
         }}
       >
         <span>TOP/100</span>
-        <span
-          style={{ width: 24, height: 1, background: GOLD_DIM }}
-        />
-        <span style={{ color: TEXT_MUTED, letterSpacing: 3 }}>
+        <span style={{ width: 24, height: 1.5, background: GOLD_DIM }} />
+        <span style={{ color: TEXT_MUTED, letterSpacing: 2, fontFamily: "Inter", fontWeight: 700, fontSize: 12 }}>
           SCRATCH-OFF
         </span>
       </div>
@@ -196,23 +224,24 @@ function LeftEditorial({
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <div
           style={{
-            fontSize: 22,
+            fontSize: 20,
             color: TEXT,
-            letterSpacing: 3,
-            fontWeight: 400,
+            letterSpacing: 2.5,
+            fontWeight: 700,
             textTransform: "uppercase",
-            marginBottom: 4,
+            marginBottom: 6,
+            fontFamily: "Inter",
           }}
         >
           {ctx.listTitle}
         </div>
         <div
           style={{
-            fontSize: 220,
-            fontWeight: 900,
+            fontSize: 230,
+            fontFamily: "ArchivoBlack",
             color: GOLD,
             lineHeight: 0.82,
-            letterSpacing: -8,
+            letterSpacing: -6,
             display: "flex",
           }}
         >
@@ -226,7 +255,7 @@ function LeftEditorial({
             color: TEXT_MUTED,
             fontSize: 18,
             fontWeight: 400,
-            marginTop: 2,
+            marginTop: 4,
           }}
         >
           <span style={{ color: TEXT, fontWeight: 700 }}>{ctx.watched}</span>
@@ -240,14 +269,14 @@ function LeftEditorial({
           display: "flex",
           alignItems: "center",
           gap: 10,
-          fontSize: 16,
+          fontSize: 15,
           color: TEXT_MUTED,
           letterSpacing: 1,
         }}
       >
         <span style={{ color: TEXT, fontWeight: 700 }}>{ctx.username}</span>
         <span style={{ color: GOLD_DIM }}>✦</span>
-        <span style={{ fontSize: 14 }}>top100scratchoff.com</span>
+        <span style={{ fontSize: 13 }}>top100scratchoff.com</span>
       </div>
     </div>
   );
@@ -256,16 +285,19 @@ function LeftEditorial({
 function TopEditorial({
   ctx,
   height,
+  width,
 }: {
   ctx: TemplateContext;
   height: number;
+  width: number;
 }) {
-  const pad = ctx.w >= 1080 ? 60 : 40;
+  const pad = ctx.w >= 1080 ? 50 : 36;
   const isStory = ctx.h > ctx.w * 1.5;
   const heroFont = isStory ? 360 : 280;
   return (
     <div
       style={{
+        width,
         height,
         padding: `${pad}px ${pad}px`,
         display: "flex",
@@ -277,17 +309,16 @@ function TopEditorial({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 10,
+          gap: 12,
           fontSize: 16,
           color: GOLD,
-          letterSpacing: 5,
-          fontWeight: 700,
-          textTransform: "uppercase",
+          letterSpacing: 4,
+          fontFamily: "ArchivoBlack",
         }}
       >
         <span>TOP/100</span>
-        <span style={{ width: 32, height: 1, background: GOLD_DIM }} />
-        <span style={{ color: TEXT_MUTED, letterSpacing: 4 }}>
+        <span style={{ width: 32, height: 1.5, background: GOLD_DIM }} />
+        <span style={{ color: TEXT_MUTED, fontFamily: "Inter", fontWeight: 700, letterSpacing: 3, fontSize: 14 }}>
           SCRATCH-OFF
         </span>
       </div>
@@ -297,9 +328,10 @@ function TopEditorial({
           style={{
             fontSize: 26,
             color: TEXT,
-            letterSpacing: 4,
+            letterSpacing: 3,
             textTransform: "uppercase",
-            fontWeight: 400,
+            fontWeight: 700,
+            fontFamily: "Inter",
           }}
         >
           {ctx.listTitle}
@@ -307,10 +339,10 @@ function TopEditorial({
         <div
           style={{
             fontSize: heroFont,
-            fontWeight: 900,
+            fontFamily: "ArchivoBlack",
             color: GOLD,
             lineHeight: 0.82,
-            letterSpacing: -10,
+            letterSpacing: -8,
             display: "flex",
           }}
         >
@@ -327,7 +359,7 @@ function TopEditorial({
         >
           <span style={{ color: TEXT, fontWeight: 700 }}>{ctx.watched}</span>
           <span>of {ctx.total} watched</span>
-          <span style={{ marginLeft: "auto", color: GOLD_DIM }}>
+          <span style={{ marginLeft: "auto", color: GOLD_DIM, fontSize: 18 }}>
             via {ctx.username}
           </span>
         </div>

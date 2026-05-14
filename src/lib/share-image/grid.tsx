@@ -23,7 +23,10 @@ export function computeGridSpec(
   total: number,
   gap = 4,
 ): GridSpec {
-  let best: { cols: number; posterW: number; posterH: number } | null = null;
+  // We track the best score, lower is better. Score considers aspect ratio
+  // distance from 2:3 *and* a heavy penalty for column counts that don't
+  // divide `total` evenly (which would leave a lonely partial last row).
+  let best: { cols: number; posterW: number; posterH: number; score: number } | null = null;
   for (let cols = 6; cols <= 30; cols++) {
     const rows = Math.ceil(total / cols);
     const posterW = (availW - (cols - 1) * gap) / cols;
@@ -31,13 +34,14 @@ export function computeGridSpec(
     if (posterH <= 0 || posterW <= 0) continue;
     const actualAspect = posterH / posterW;
     const aspectDelta = Math.abs(actualAspect - 1.5);
+    const dividesEvenly = total % cols === 0;
     const score =
-      aspectDelta + (posterW < 50 ? 0.5 : 0) + (posterW < 30 ? 1 : 0);
-    if (
-      !best ||
-      score < Math.abs(best.posterH / best.posterW - 1.5)
-    ) {
-      best = { cols, posterW, posterH };
+      aspectDelta +
+      (dividesEvenly ? 0 : 0.6) + // big bonus for clean rows
+      (posterW < 50 ? 0.5 : 0) +
+      (posterW < 30 ? 1 : 0);
+    if (!best || score < best.score) {
+      best = { cols, posterW, posterH, score };
     }
   }
   if (!best) {
@@ -47,6 +51,7 @@ export function computeGridSpec(
       cols,
       posterW: availW / cols - gap,
       posterH: availH / rows - gap,
+      score: 0,
     };
   }
   const cellW = best.posterW;
@@ -138,7 +143,7 @@ export function PosterGrid({
                   height: "100%",
                   objectFit: "cover",
                   filter: watched
-                    ? "saturate(1.25) contrast(1.08)"
+                    ? "saturate(1.35) contrast(1.1) brightness(1.05)"
                     : "grayscale(100%) brightness(0.26)",
                   opacity: watched ? 1 : 0.42,
                 }}

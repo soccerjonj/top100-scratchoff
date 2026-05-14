@@ -33,8 +33,8 @@ export async function GET(
   const sp = req.nextUrl.searchParams;
   const sizeParam = sp.get("size") ?? "og";
   const size: ShareSize = isSize(sizeParam) ? sizeParam : "og";
-  const templateParam = sp.get("template") ?? "current";
-  const template: Template = isTemplate(templateParam) ? templateParam : "current";
+  const templateParam = sp.get("template") ?? "a";
+  const template: Template = isTemplate(templateParam) ? templateParam : "a";
   const download = sp.get("download") === "1";
 
   const user = await getUser(username);
