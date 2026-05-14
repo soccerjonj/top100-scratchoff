@@ -1,14 +1,21 @@
 import { NextRequest } from "next/server";
-import { renderShareImage, type ShareSize } from "@/lib/share-image";
+import {
+  renderShareImage,
+  type ShareSize,
+  type Template,
+} from "@/lib/share-image";
 import { getUser, normalizeUsername } from "@/lib/user";
 import { LISTS } from "@/lib/lists";
 import type { ListId } from "@/types";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const isListId = (v: string): v is ListId => v in LISTS;
 const isSize = (v: string): v is ShareSize =>
   v === "og" || v === "square" || v === "story";
+const isTemplate = (v: string): v is Template =>
+  v === "current" || v === "a" || v === "b";
 
 export async function GET(
   req: NextRequest,
@@ -26,17 +33,19 @@ export async function GET(
   const sp = req.nextUrl.searchParams;
   const sizeParam = sp.get("size") ?? "og";
   const size: ShareSize = isSize(sizeParam) ? sizeParam : "og";
+  const templateParam = sp.get("template") ?? "current";
+  const template: Template = isTemplate(templateParam) ? templateParam : "current";
   const download = sp.get("download") === "1";
 
   const user = await getUser(username);
-  const res = renderShareImage({
+  const res = await renderShareImage({
     size,
+    template,
     listId: list,
     watchedSlugs: user?.watchedSlugs ?? [],
     username,
   });
 
-  // CDN-friendly caching: 5min hot, 1day stale-while-revalidate
   res.headers.set(
     "Cache-Control",
     "public, s-maxage=300, stale-while-revalidate=86400",
@@ -44,7 +53,7 @@ export async function GET(
   if (download) {
     res.headers.set(
       "Content-Disposition",
-      `attachment; filename="${username}-${list}-${size}.png"`,
+      `attachment; filename="${username}-${list}-${size}${template !== "current" ? `-${template}` : ""}.png"`,
     );
   }
   return res;
