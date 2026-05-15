@@ -5,6 +5,7 @@ import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListSwitcher } from "@/components/ListSwitcher";
 import { RememberMe } from "@/components/RememberMe";
+import { getCustomListsForUser } from "@/lib/custom-list";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
 import type { ListId } from "@/types";
@@ -63,7 +64,15 @@ export default async function UserPage({
   const { username: rawUsername } = await params;
   const { list: rawList, density: rawDensity } = await searchParams;
   const username = normalizeUsername(rawUsername);
-  const activeList: ListId = isListId(rawList) ? rawList : "imdb-top-100";
+  // Accept either a built-in ListId or a custom-list hash id (16 hex chars).
+  // The ListSwitcher validates against the actual list set on the client.
+  const rawListClean = typeof rawList === "string" ? rawList : "";
+  const isCustomId = /^[0-9a-f]{16}$/.test(rawListClean);
+  const activeList: string = isListId(rawList)
+    ? rawList
+    : isCustomId
+      ? rawListClean
+      : "imdb-top-100";
   const density: Density = rawDensity === "comfy" ? "comfy" : "dense";
 
   let user;
@@ -75,9 +84,16 @@ export default async function UserPage({
   }
 
   const hasCsv = user.csvUploadedAt != null;
-  const preloadHref = `/api/share-image/${username}/${activeList}?size=og`;
+  // Custom-list share image isn't supported yet, so the OG preload + Share
+  // button fall back to imdb-top-100 when a custom list is active.
+  const sharableList: ListId = isListId(activeList)
+    ? activeList
+    : "imdb-top-100";
+  const preloadHref = `/api/share-image/${username}/${sharableList}?size=og`;
   // Apply manual overrides on top of scraped/CSV slugs.
   const effectiveWatched = Array.from(effectiveWatchedSet(user));
+  // Custom lists the user has attached to their profile.
+  const customLists = await getCustomListsForUser(user.customListIds ?? []);
 
   return (
     <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
@@ -96,7 +112,7 @@ export default async function UserPage({
           </p>
         </div>
         <Link
-          href={`/share/${username}/${activeList}`}
+          href={`/share/${username}/${sharableList}`}
           className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
         >
           ✨ Share
@@ -125,6 +141,7 @@ export default async function UserPage({
         initialDensity={density}
         watchedSlugs={effectiveWatched}
         ownerUsername={username}
+        customLists={customLists}
       />
 
       {/* Less-frequent actions live below the grid so they don't push posters off-screen on mobile */}

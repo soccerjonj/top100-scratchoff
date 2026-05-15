@@ -1,5 +1,5 @@
 import { MongoClient, type Db, type Collection } from "mongodb";
-import type { UserRecord } from "@/types";
+import type { UserRecord, CustomListRecord } from "@/types";
 
 const uri = process.env.MONGODB_URI;
 
@@ -28,5 +28,14 @@ export async function getUsersCollection(): Promise<Collection<UserRecord>> {
   const col = db.collection<UserRecord>("users");
   await col.createIndex({ username: 1 }, { unique: true });
   await col.createIndex({ lastScrapedAt: 1 });
+  return col;
+}
+
+export async function getCustomListsCollection(): Promise<
+  Collection<CustomListRecord>
+> {
+  const db = await getDb();
+  const col = db.collection<CustomListRecord>("customLists");
+  await col.createIndex({ id: 1 }, { unique: true });
   return col;
 }

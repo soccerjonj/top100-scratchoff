@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { LISTS } from "@/lib/lists";
-import type { FilmEntry, ListId } from "@/types";
+import type { CustomListRecord, FilmEntry, ListId } from "@/types";
 import { PosterGrid, type Density } from "./PosterGrid";
 import { ProgressBar } from "./ProgressBar";
 import { PosterPreloader } from "./PosterPreloader";
+import { AddCustomListButton } from "./AddCustomListButton";
 
-const ORDER: ListId[] = [
+const BUILT_IN_ORDER: ListId[] = [
   "imdb-top-100",
   "afi-top-100",
   "nyt-top-100",
@@ -21,48 +22,75 @@ const SHORT_TITLE: Record<ListId, string> = {
   "letterboxd-top-500": "Letterboxd 500",
 };
 
-/**
- * All 4 grids rendered upfront, only one visible at a time. Tab and
- * density changes are client-side state (no server roundtrip, no
- * remount of any PosterCard), so switching feels instant.
- *
- * URL stays in sync via history.replaceState so deep-links and the
- * per-list share buttons continue to work.
- *
- * Inactive grids are display:none so they don't paint, but they ARE
- * in the DOM. Once their poster images land in the browser cache (via
- * PosterPreloader, which kicks off background fetches 1.5s after mount)
- * the first switch to each tab is also instant.
- */
+interface ListView {
+  id: string;
+  title: string;
+  shortTitle: string;
+  entries: FilmEntry[];
+  sourceUrl?: string;
+  sourceLabel?: string;
+  isCustom: boolean;
+}
+
 export function ListSwitcher({
   initialList,
   initialDensity,
   watchedSlugs,
   ownerUsername,
+  customLists = [],
 }: {
-  initialList: ListId;
+  initialList: string;
   initialDensity: Density;
   watchedSlugs: string[];
   ownerUsername?: string;
+  customLists?: CustomListRecord[];
 }) {
-  const [activeId, setActiveId] = useState<ListId>(initialList);
+  const [activeId, setActiveId] = useState<string>(initialList);
   const [density, setDensity] = useState<Density>(initialDensity);
   const watchedSet = useMemo(() => new Set(watchedSlugs), [watchedSlugs]);
+
+  // Build the unified list-of-lists. Built-ins first, then user's custom
+  // lists in the order they were added.
+  const lists = useMemo<ListView[]>(() => {
+    const out: ListView[] = BUILT_IN_ORDER.map((id) => ({
+      id,
+      title: LISTS[id].title,
+      shortTitle: SHORT_TITLE[id],
+      entries: LISTS[id].entries,
+      sourceUrl: LISTS[id].sourceUrl,
+      sourceLabel: LISTS[id].sourceLabel,
+      isCustom: false,
+    }));
+    for (const c of customLists) {
+      out.push({
+        id: c.id,
+        title: c.title,
+        shortTitle: c.title.length > 22 ? c.title.slice(0, 22) + "…" : c.title,
+        entries: c.entries,
+        sourceUrl: c.url,
+        sourceLabel: "View on Letterboxd",
+        isCustom: true,
+      });
+    }
+    return out;
+  }, [customLists]);
+
+  const validIds = useMemo(() => new Set(lists.map((l) => l.id)), [lists]);
 
   // Sync state from URL on back/forward.
   useEffect(() => {
     function syncFromUrl() {
       const url = new URL(window.location.href);
-      const list = url.searchParams.get("list") as ListId | null;
+      const list = url.searchParams.get("list");
       const d = url.searchParams.get("density") as Density | null;
-      if (list && ORDER.includes(list)) setActiveId(list);
+      if (list && validIds.has(list)) setActiveId(list);
       if (d === "comfy" || d === "dense") setDensity(d);
     }
     window.addEventListener("popstate", syncFromUrl);
     return () => window.removeEventListener("popstate", syncFromUrl);
-  }, []);
+  }, [validIds]);
 
-  function updateUrl(next: { list?: ListId; density?: Density }) {
+  function updateUrl(next: { list?: string; density?: Density }) {
     const url = new URL(window.location.href);
     if (next.list) url.searchParams.set("list", next.list);
     if (next.density) {
@@ -72,7 +100,7 @@ export function ListSwitcher({
     window.history.replaceState({}, "", url.toString());
   }
 
-  function activateList(id: ListId) {
+  function activateList(id: string) {
     if (id === activeId) return;
     setActiveId(id);
     updateUrl({ list: id });
@@ -84,22 +112,40 @@ export function ListSwitcher({
     updateUrl({ density: d });
   }
 
-  const activeList = LISTS[activeId];
+  const activeList = lists.find((l) => l.id === activeId) ?? lists[0];
   const watchedInList = activeList.entries.filter((e) =>
     watchedSet.has(e.letterboxdSlug),
   ).length;
+
+  async function removeCustomList(id: string) {
+    if (!ownerUsername) return;
+    if (!confirm("Remove this list from your profile?")) return;
+    try {
+      const res = await fetch("/api/custom-list/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: ownerUsername, id }),
+      });
+      if (res.ok) {
+        // Hard reload so the server re-fetches custom lists.
+        window.location.assign(`/u/${ownerUsername}`);
+      }
+    } catch {
+      // Best-effort
+    }
+  }
 
   return (
     <div className="flex flex-col gap-5">
       {/* Tabs */}
       <nav className="-mx-3 flex gap-2 overflow-x-auto whitespace-nowrap border-b border-zinc-800 px-3 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-        {ORDER.map((id) => {
-          const isActive = id === activeId;
+        {lists.map((l) => {
+          const isActive = l.id === activeId;
           return (
             <button
-              key={id}
+              key={l.id}
               type="button"
-              onClick={() => activateList(id)}
+              onClick={() => activateList(l.id)}
               className={[
                 "shrink-0 rounded-full border px-3 py-1.5 text-xs transition sm:px-4 sm:text-sm",
                 isActive
@@ -107,11 +153,14 @@ export function ListSwitcher({
                   : "border-zinc-700 text-zinc-400 hover:border-gold/50 hover:text-gold/80",
               ].join(" ")}
             >
-              <span className="sm:hidden">{SHORT_TITLE[id]}</span>
-              <span className="hidden sm:inline">{LISTS[id].title}</span>
+              <span className="sm:hidden">{l.shortTitle}</span>
+              <span className="hidden sm:inline">{l.title}</span>
             </button>
           );
         })}
+        {ownerUsername && (
+          <AddCustomListButton username={ownerUsername} />
+        )}
       </nav>
 
       {/* Progress + source link + density toggle */}
@@ -122,7 +171,7 @@ export function ListSwitcher({
             total={activeList.entries.length}
           />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {activeList.sourceUrl && (
             <a
               href={activeList.sourceUrl}
@@ -132,6 +181,15 @@ export function ListSwitcher({
             >
               {activeList.sourceLabel ?? "View on Letterboxd"} ↗
             </a>
+          )}
+          {activeList.isCustom && ownerUsername && (
+            <button
+              type="button"
+              onClick={() => removeCustomList(activeList.id)}
+              className="text-xs text-zinc-600 underline-offset-2 hover:text-red-400 hover:underline"
+            >
+              Remove this list
+            </button>
           )}
           <nav className="flex items-center gap-1 text-xs">
             <span className="text-zinc-600">Size:</span>
@@ -157,28 +215,33 @@ export function ListSwitcher({
         </div>
       </div>
 
-      {/* All 4 grids rendered, one visible. */}
-      {ORDER.map((id) => {
-        const entries: FilmEntry[] = LISTS[id].entries;
-        const visible = id === activeId;
+      {/* All grids rendered, only the active one visible. */}
+      {lists.map((l) => {
+        const visible = l.id === activeId;
         return (
           <div
-            key={id}
+            key={l.id}
             style={{ display: visible ? undefined : "none" }}
             aria-hidden={!visible}
           >
             <PosterGrid
-              entries={entries}
+              entries={l.entries}
               watchedSet={watchedSet}
               density={density}
-              listTitle={LISTS[id].title}
+              listTitle={l.title}
               ownerUsername={ownerUsername}
             />
           </div>
         );
       })}
 
-      <PosterPreloader activeListId={activeId} />
+      <PosterPreloader
+        activeListId={
+          BUILT_IN_ORDER.includes(activeId as ListId)
+            ? (activeId as ListId)
+            : "imdb-top-100"
+        }
+      />
     </div>
   );
 }
