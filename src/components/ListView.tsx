@@ -21,8 +21,12 @@ export function ListView({
   density?: Density;
   /** Extra search params to preserve on tab/toggle links (e.g. mode= on /together). */
   extraParams?: Record<string, string>;
-  /** Single-user views pass this so the per-movie dialog gets a manual-watch toggle. */
-  ownerUsername?: string;
+  /**
+   * Owner of the manual-watch toggle. Pass a single username on solo
+   * views, or an array on /together so the toggle fans out to every
+   * user in the pair.
+   */
+  ownerUsername?: string | string[];
 }) {
   const list = LISTS[activeList];
   const watchedSet = new Set(watchedSlugs);

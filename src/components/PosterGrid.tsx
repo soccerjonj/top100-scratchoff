@@ -23,7 +23,7 @@ export function PosterGrid({
   /** Shown in the per-movie dialog as "#N in {listTitle}". */
   listTitle?: string;
   /** Single-user views pass this so the dialog can show a manual-watch toggle. */
-  ownerUsername?: string;
+  ownerUsername?: string | string[];
 }) {
   return (
     <div className={`grid gap-1.5 sm:gap-2 ${CLASS_BY_DENSITY[density]}`}>

@@ -26,11 +26,12 @@ export function PosterCard({
   watched: boolean;
   listTitle?: string;
   /**
-   * The username whose grid is being viewed. Required for manual-watch
-   * toggling — without it (e.g. on /together views with multiple users)
-   * the toggle is hidden.
+   * The username(s) the toggle should write to. Single string → solo
+   * /u/[username] view. Array of usernames → /together view, where
+   * toggling fans out to each user's record in parallel so a single
+   * tap covers "both of us".
    */
-  ownerUsername?: string;
+  ownerUsername?: string | string[];
 }) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -97,21 +98,31 @@ export function PosterCard({
     ? `https://image.tmdb.org/t/p/w500${entry.posterPath}`
     : null;
 
+  const ownerList: string[] = !ownerUsername
+    ? []
+    : Array.isArray(ownerUsername)
+      ? ownerUsername
+      : [ownerUsername];
+  const isMultiOwner = ownerList.length > 1;
+
   async function toggleManualWatched() {
-    if (!ownerUsername || toggling) return;
+    if (ownerList.length === 0 || toggling) return;
     const next = !effectiveWatched;
     setOptimisticWatched(next);
     setToggling(true);
     try {
-      const res = await fetch(
-        `/api/user/${ownerUsername}/manual-watch`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug: entry.letterboxdSlug, watched: next }),
-        },
+      const results = await Promise.all(
+        ownerList.map((u) =>
+          fetch(`/api/user/${u}/manual-watch`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug: entry.letterboxdSlug, watched: next }),
+          }),
+        ),
       );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (results.some((r) => !r.ok)) {
+        throw new Error("one or more updates failed");
+      }
       // Background refresh: tells the route segment to re-render with the
       // updated Mongo data. The optimistic state stays until the page
       // re-renders with the real watched prop.
@@ -235,7 +246,7 @@ export function PosterCard({
                   Not watched yet
                 </div>
               )}
-              {ownerUsername && (
+              {ownerList.length > 0 && (
                 <button
                   type="button"
                   onClick={toggleManualWatched}
@@ -245,15 +256,20 @@ export function PosterCard({
                   {toggling
                     ? "Saving…"
                     : effectiveWatched
-                      ? "Mark unwatched"
-                      : "✓ Mark watched"}
+                      ? isMultiOwner
+                        ? "Mark unwatched (both)"
+                        : "Mark unwatched"
+                      : isMultiOwner
+                        ? "✓ Mark both watched"
+                        : "✓ Mark watched"}
                 </button>
               )}
             </div>
-            {ownerUsername && !watched && optimisticWatched === null && (
+            {ownerList.length > 0 && !watched && optimisticWatched === null && (
               <p className="text-[10px] text-zinc-600">
-                Manual marks save to your record — useful if you don&apos;t use
-                Letterboxd or it&apos;s missing from your export.
+                {isMultiOwner
+                  ? `Marks save to both ${ownerList.join(" and ")} — handy when one of you forgot to log a film.`
+                  : "Manual marks save to your record — useful if you don't use Letterboxd or it's missing from your export."}
               </p>
             )}
 

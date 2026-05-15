@@ -168,6 +168,7 @@ export default async function TogetherPage({
         basePath={base}
         density={density}
         extraParams={{ mode }}
+        ownerUsername={usernames}
       />
     </main>
   );
