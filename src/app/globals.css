@@ -13,28 +13,335 @@
   --color-gold: var(--gold);
   --color-gold-dim: var(--gold-dim);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-playfair, "Playfair Display"), Georgia, "Times New Roman", serif;
 }
 
 html, body {
-  background: var(--background);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, #15110a 0%, #0b0b0f 55%, var(--background) 100%);
+  background-attachment: fixed;
   color: var(--foreground);
 }
 
-/* The "scratched" reveal — used by PosterCard when watched */
+/* A 1px gold gradient hairline at the very top of the viewport — frames
+   the page like a poster border. */
+.page-hairline {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 1px;
+  pointer-events: none;
+  z-index: 60;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.55), transparent);
+}
+
+/* Universal film-grain overlay — inline SVG noise on a fixed element so
+   it costs one paint regardless of how many posters are on screen. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 70;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.96  0 0 0 0 0.78  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay { display: none; }
+}
+
+/* The "scratched" reveal — used by PosterCard when watched.
+   We use the individual `scale`/`translate` CSS properties (not the
+   `transform` shorthand) because Tailwind v4 routes `transform`
+   through CSS custom properties for its rotate/skew utilities, and
+   that intercepts a raw `transform: scale(...)` on the same element. */
 .poster-watched {
   filter: none;
-  transform: scale(1);
+  scale: 1;
+  translate: 0 0;
   opacity: 1;
 }
 
 .poster-unwatched {
   filter: grayscale(1) brightness(0.55);
-  transform: scale(0.88);
+  scale: 0.88;
+  translate: 0 0;
   opacity: 0.7;
 }
 
 .poster-card {
-  transition: filter 400ms ease, transform 400ms ease, opacity 400ms ease;
+  position: relative;
+  /* Default transform-origin (center center) — unwatched posters
+     shrink toward the middle of their grid cell instead of pinning
+     to the bottom, which gives the grid a cleaner top edge. */
+  transition:
+    filter 400ms ease,
+    scale 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    translate 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 400ms ease,
+    box-shadow 260ms ease;
+  will-change: scale, translate, filter;
+}
+
+/* Hover/focus only on pointer devices — touch should never get stuck states. */
+@media (hover: hover) {
+  .poster-card.poster-watched:hover,
+  .poster-card.poster-watched:focus-visible {
+    scale: 1.04;
+    translate: 0 -4px;
+    filter: drop-shadow(0 10px 22px rgba(212, 175, 55, 0.38));
+  }
+  .poster-card.poster-unwatched:hover,
+  .poster-card.poster-unwatched:focus-visible {
+    scale: 0.94;
+    translate: 0 -3px;
+    filter: grayscale(0.4) brightness(0.8);
+    opacity: 0.95;
+  }
+}
+
+/* Cursor-tracked gold spotlight inside each poster. The PosterCard's
+   onMouseMove sets --mx / --my as % values; the rest is CSS. */
+.poster-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  background: radial-gradient(
+    140px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 232, 138, 0.32),
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+  z-index: 1;
+}
+@media (hover: hover) {
+  .poster-card:hover .poster-spotlight,
+  .poster-card:focus-visible .poster-spotlight {
+    opacity: 1;
+  }
+}
+
+/* Rank badge bounce on hover */
+@keyframes rank-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@media (hover: hover) {
+  .poster-card:hover .poster-rank,
+  .poster-card:focus-visible .poster-rank {
+    animation: rank-bounce 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+/* Title overlay: slide up + fade in on hover (was just fade) */
+.poster-title {
+  transform: translateY(8px);
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+@media (hover: hover) {
+  .poster-card:hover .poster-title,
+  .poster-card:focus-visible .poster-title {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Watched-flip celebration: gold sheen sweep across the poster */
+@keyframes sheen-sweep {
+  0%   { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  18%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+.poster-sheen {
+  position: absolute;
+  inset: -10% -25%;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    90deg,
+    transparent 35%,
+    rgba(255, 232, 138, 0.65) 50%,
+    transparent 65%
+  );
+  filter: blur(2px);
+  animation: sheen-sweep 720ms ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-sheen { display: none; }
+}
+
+/* Gold sparkle particles emitted on watched flip. JSX sets --dx / --dy
+   inline so each particle drifts in a different direction. */
+@keyframes sparkle {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  18%  { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -36px))) scale(0); opacity: 0; }
+}
+.poster-sparkle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(circle, #ffe88a 0%, rgba(255, 232, 138, 0) 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  animation: sparkle var(--dur, 720ms) ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-sparkle { display: none; }
+}
+
+/* Subtle tab-switch flash on the grid below the tab bar */
+@keyframes tab-flash {
+  0%   { opacity: 1; transform: translateY(6px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+.tab-switch-flash {
+  background: linear-gradient(to bottom, rgba(212, 175, 55, 0.10), transparent 28%);
+  animation: tab-flash 480ms ease-out forwards;
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-switch-flash { display: none; }
+}
+
+/* Progress bar — gold sheen sweep inside the filled portion */
+@keyframes progress-shimmer {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+.progress-shimmer {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.38),
+    transparent
+  );
+  background-size: 35% 100%;
+  background-repeat: no-repeat;
+  animation: progress-shimmer 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-shimmer { animation: none; opacity: 0; }
+}
+
+/* Progress count milestone flash */
+@keyframes progress-flash {
+  0%, 100% { color: var(--gold); text-shadow: none; }
+  50% {
+    color: #fff7d6;
+    text-shadow: 0 0 12px rgba(255, 232, 138, 0.7);
+  }
+}
+.progress-flash {
+  animation: progress-flash 700ms ease-out;
+}
+
+/* H1 title shimmer — used once on landing page mount */
+@keyframes text-shimmer {
+  0%   { background-position: 200% 50%; }
+  100% { background-position: -200% 50%; }
+}
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gold) 0%,
+    var(--gold) 38%,
+    #fff3b8 50%,
+    var(--gold) 62%,
+    var(--gold) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-position: 200% 50%;
+  animation: text-shimmer 2.2s ease-out 0.45s 1 forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-shimmer {
+    animation: none;
+    color: var(--gold);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+  }
+}
+
+/* Spotlight glow drifting behind the landing-page hero */
+@keyframes spotlight-drift {
+  0%, 100% { transform: translate3d(-7%, 0, 0); }
+  50%      { transform: translate3d(7%, 0, 0); }
+}
+.spotlight-drift {
+  position: absolute;
+  inset: -20% -20% auto -20%;
+  height: 70%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 55% 65% at 50% 50%,
+    rgba(212, 175, 55, 0.22),
+    transparent 70%
+  );
+  filter: blur(48px);
+  animation: spotlight-drift 22s ease-in-out infinite;
+  z-index: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-drift { animation: none; }
+}
+
+/* Stagger-rise on landing page — CSS keyframe alternative to motion stagger */
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-rise-1 { animation: fade-rise 0.6s ease-out 0.00s both; }
+.fade-rise-2 { animation: fade-rise 0.6s ease-out 0.10s both; }
+.fade-rise-3 { animation: fade-rise 0.6s ease-out 0.20s both; }
+.fade-rise-4 { animation: fade-rise 0.6s ease-out 0.30s both; }
+.fade-rise-5 { animation: fade-rise 0.6s ease-out 0.40s both; }
+@media (prefers-reduced-motion: reduce) {
+  .fade-rise-1, .fade-rise-2, .fade-rise-3, .fade-rise-4, .fade-rise-5 {
+    animation: none;
+  }
+}
+
+/* ContinueShortcut: subtle pulsing gold ring to draw the eye */
+@keyframes continue-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+  50%      { box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.20); }
+}
+.continue-pulse {
+  animation: continue-pulse 3.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .continue-pulse { animation: none; }
+}
+
+/* Modal: gold ambience behind the poster column */
+.modal-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 50%,
+    rgba(212, 175, 55, 0.18),
+    transparent 70%
+  );
+  mix-blend-mode: screen;
 }
 
 /* Grid density. Mobile gets tighter minmax so far more posters fit on screen.

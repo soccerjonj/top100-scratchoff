@@ -14,7 +14,7 @@ import {
 } from "./grid";
 import type { TemplateContext } from "./index";
 
-const SITE_URL = "top100scratchoff.com";
+const SITE_URL = "wellwatched.app";
 
 export async function renderTemplateCurrent(ctx: TemplateContext): Promise<{
   element: ReactElement;
@@ -124,7 +124,7 @@ export async function renderTemplateCurrent(ctx: TemplateContext): Promise<{
         }}
       >
         <span>{SITE_URL}</span>
-        <span style={{ color: "#d4af37" }}>scratch-off</span>
+        <span style={{ color: "#d4af37" }}>track & share</span>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-# Top 100 — Scratch-Off
+# Wellwatched
 
-A "scratch-off poster" web version of the IMDB Top 100 Fan Favorites and Letterboxd Top 500. Enter your Letterboxd username; watched films show in color, unwatched are greyed out and slightly smaller. The site scrapes your public `/films` page and re-checks daily.
+Track and share your film-list progress. A scratch-off-style web tracker for the IMDB Top 100, AFI 100, NYT 21st-Century 100, and Letterboxd Top 500 — enter your Letterboxd username and watched films bloom into color while unwatched ones stay greyed out and slightly smaller. The site scrapes your public `/films` page and re-checks daily.
 
 ## Stack
 - Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4
@@ -20,7 +20,7 @@ A "scratch-off poster" web version of the IMDB Top 100 Fan Favorites and Letterb
    - `CRON_SECRET` — any random string
 
 3. **Seed the lists** (one-time)
-   Drop the 100 titles from your scratch-off poster into `scripts/raw/imdb-top-100.txt` (one `Title (YYYY)` per line). Then:
+   Drop the 100 titles from the IMDB Top 100 source list into `scripts/raw/imdb-top-100.txt` (one `Title (YYYY)` per line). Then:
    ```bash
    # Scrape Letterboxd's Top 500 list page first
    npm run build-lists -- --scrape-letterboxd

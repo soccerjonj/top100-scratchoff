@@ -224,11 +224,7 @@ function LeftEditorial({
           fontFamily: "ArchivoBlack",
         }}
       >
-        <span>TOP/100</span>
-        <span style={{ width: 24, height: 1.5, background: GOLD_DIM }} />
-        <span style={{ color: TEXT_MUTED, letterSpacing: 2, fontFamily: "Inter", fontWeight: 700, fontSize: 12 }}>
-          SCRATCH-OFF
-        </span>
+        <span>WELLWATCHED</span>
       </div>
 
       {/* Middle: editorial title + hero stat */}
@@ -287,7 +283,7 @@ function LeftEditorial({
       >
         <span style={{ color: TEXT, fontWeight: 700 }}>{ctx.username}</span>
         <span style={{ color: GOLD_DIM }}>✦</span>
-        <span style={{ fontSize: 13 }}>top100scratchoff.com</span>
+        <span style={{ fontSize: 13 }}>wellwatched.app</span>
       </div>
     </div>
   );
@@ -327,11 +323,7 @@ function TopEditorial({
           fontFamily: "ArchivoBlack",
         }}
       >
-        <span>TOP/100</span>
-        <span style={{ width: 32, height: 1.5, background: GOLD_DIM }} />
-        <span style={{ color: TEXT_MUTED, fontFamily: "Inter", fontWeight: 700, letterSpacing: 3, fontSize: 14 }}>
-          SCRATCH-OFF
-        </span>
+        <span>WELLWATCHED</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

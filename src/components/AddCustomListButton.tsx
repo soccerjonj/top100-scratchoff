@@ -68,9 +68,9 @@ export function AddCustomListButton({ username }: { username: string }) {
         onClick={(e) => {
           if (e.target === dialogRef.current) close();
         }}
-        className="m-auto w-[min(480px,calc(100vw-1rem))] rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
+        className="m-auto w-[min(480px,calc(100vw-1rem))] overflow-hidden whitespace-normal rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
       >
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 overflow-hidden p-5 [&>*]:min-w-0">
           <div>
             <h2 className="text-lg font-bold">Add a Letterboxd list</h2>
             <p className="mt-1 text-xs text-zinc-500">
@@ -80,7 +80,7 @@ export function AddCustomListButton({ username }: { username: string }) {
             </p>
           </div>
 
-          <label className="flex flex-col gap-1.5 text-xs uppercase tracking-wider text-zinc-500">
+          <label className="flex min-w-0 flex-col gap-1.5 text-xs uppercase tracking-wider text-zinc-500">
             List URL
             <input
               type="url"
@@ -91,7 +91,7 @@ export function AddCustomListButton({ username }: { username: string }) {
               autoCorrect="off"
               spellCheck={false}
               disabled={busy}
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm normal-case tracking-normal text-foreground placeholder:text-zinc-600 focus:border-gold focus:outline-none"
+              className="w-full min-w-0 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm normal-case tracking-normal text-foreground placeholder:text-zinc-600 focus:border-gold focus:outline-none"
             />
           </label>
 
@@ -124,10 +124,11 @@ export function AddCustomListButton({ username }: { username: string }) {
             </button>
           </div>
 
-          <p className="text-[10px] text-zinc-600">
-            Tip: any list at <code>letterboxd.com/&lt;user&gt;/list/&lt;name&gt;/</code> works
-            — Letterboxd&apos;s official lists, friends&apos; lists, awards rosters,
-            anything public.
+          <p className="break-words text-[10px] text-zinc-600">
+            Tip: any list at{" "}
+            <code className="break-all">letterboxd.com/&lt;user&gt;/list/&lt;name&gt;/</code>
+            {" "}works — Letterboxd&apos;s official lists, friends&apos; lists,
+            awards rosters, anything public.
           </p>
         </form>
       </dialog>

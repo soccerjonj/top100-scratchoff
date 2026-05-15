@@ -92,7 +92,7 @@ export function PreviewWithProgress({
           ].join(" ")}
         >
           <div className="text-center text-xs uppercase tracking-widest text-zinc-500">
-            Generating your scratch-off
+            Generating your share image
           </div>
           <div className="h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800">
             <div

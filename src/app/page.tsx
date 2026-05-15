@@ -4,21 +4,25 @@ import { ContinueShortcut } from "@/components/ContinueShortcut";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-8 px-6 py-16 text-center">
-      <h1 className="text-5xl font-bold tracking-tight">
-        <span className="text-gold">Top 100</span> Scratch-Off
+    <main className="relative mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-8 overflow-hidden px-6 py-16 text-center">
+      <div className="spotlight-drift" aria-hidden />
+      <h1 className="fade-rise-1 relative font-display text-5xl font-bold tracking-tight sm:text-6xl">
+        <span className="text-shimmer">Wellwatched</span>
       </h1>
-      <p className="max-w-md text-balance text-zinc-400">
-        Enter your Letterboxd username to reveal which films you&apos;ve watched
-        from the IMDB Top 100, AFI 100, NYT 21st-Century 100, and Letterboxd
-        Top 500. Updated daily.
+      <p className="fade-rise-2 relative max-w-md text-balance text-zinc-400">
+        Track and share your film-list progress. Enter your Letterboxd
+        username to reveal which films you&apos;ve watched from the IMDB
+        Top 100, AFI 100, NYT 21st-Century 100, and Letterboxd Top 500.
+        Updated daily.
       </p>
-      <ContinueShortcut />
-      <UsernameForm />
-      <p className="text-xs text-zinc-600">
+      <div className="fade-rise-3 relative flex w-full flex-col items-center gap-6">
+        <ContinueShortcut />
+        <UsernameForm />
+      </div>
+      <p className="fade-rise-4 relative text-xs text-zinc-600">
         Your username is public. We scrape your public /films page only.
       </p>
-      <div className="border-t border-zinc-900 pt-6 text-sm">
+      <div className="fade-rise-5 relative border-t border-zinc-900 pt-6 text-sm">
         <p className="text-zinc-500">
           Don&apos;t have Letterboxd?{" "}
           <Link

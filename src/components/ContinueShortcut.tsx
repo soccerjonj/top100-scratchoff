@@ -60,7 +60,7 @@ export function ContinueShortcut() {
             onClick={() =>
               router.push(`/together/${lastUser}/${lastPartner}`)
             }
-            className="rounded-md bg-gold px-4 py-3 text-left font-semibold text-black hover:bg-gold-dim"
+            className="continue-pulse rounded-md bg-gold px-4 py-3 text-left font-semibold text-black transition hover:bg-gold-dim"
           >
             Open with{" "}
             <span className="font-bold">
@@ -80,7 +80,7 @@ export function ContinueShortcut() {
         <button
           type="button"
           onClick={() => router.push(`/u/${lastUser}`)}
-          className="rounded-md bg-gold px-4 py-3 text-left font-semibold text-black hover:bg-gold-dim"
+          className="continue-pulse rounded-md bg-gold px-4 py-3 text-left font-semibold text-black transition hover:bg-gold-dim"
         >
           Continue as <span className="font-bold">{lastUser}</span> →
         </button>

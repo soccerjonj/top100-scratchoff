@@ -73,7 +73,7 @@ export function GuestForm() {
       </button>
       <p className="text-xs text-zinc-600">
         Your nickname becomes the URL you bookmark
-        (top100scratchoff.com/u/<span className="text-zinc-400">your-nickname</span>).
+        (wellwatched.app/u/<span className="text-zinc-400">your-nickname</span>).
         Share it with friends or keep it private.
       </p>
     </form>

@@ -7,6 +7,7 @@ import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { effectiveWatchedSet, type ListId } from "@/types";
 import { DownloadButton } from "@/components/DownloadButton";
 import { PreviewWithProgress } from "@/components/PreviewWithProgress";
+import { ShareIcon } from "@/components/ShareIcon";
 
 export const dynamic = "force-dynamic";
 
@@ -44,12 +45,27 @@ export async function generateMetadata({
   const { usernames, list } = parsed;
   const display = usernames.join(" × ");
   const title = `${display} · ${LISTS[list].title}`;
-  const description = `See which films ${display} have both watched from ${LISTS[list].title} on top100scratchoff.com.`;
+  const description = `See which films ${display} have both watched from ${LISTS[list].title} on wellwatched.app.`;
+  // Link-preview image points at the existing share-image API route.
+  // We can't use the file-convention opengraph-image.tsx here because
+  // Next.js disallows placing it as a sibling of a [...catchall]
+  // segment — the catch-all must be the final path component.
+  const ogImage = `/api/share-image/together/${usernames.join("/")}/${list}?size=og&mode=both`;
   return {
     title,
     description,
-    openGraph: { title, description, type: "website" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -104,13 +120,12 @@ export default async function TogetherSharePage({
   const apiBase = `/api/share-image/together/${usernames.join("/")}/${list}`;
   const params0 = `mode=${mode}`;
   const ogSrc = `${apiBase}?size=og&${params0}`;
-  const squareSrc = `${apiBase}?size=square&${params0}`;
   const storySrc = `${apiBase}?size=story&${params0}`;
 
   // Share-intent text
   const verb = mode === "both" ? "We've both watched" : "Between us we've watched";
   const text = encodeURIComponent(
-    `${verb} ${watched}/${total} (${pct}%) of the ${listMeta.title} on top100scratchoff.com 🎬✨`,
+    `${verb} ${watched}/${total} (${pct}%) of the ${listMeta.title} on wellwatched.app 🎬✨`,
   );
   const xUrl = `https://twitter.com/intent/tweet?text=${text}`;
   const threadsUrl = `https://www.threads.net/intent/post?text=${text}`;
@@ -152,60 +167,57 @@ export default async function TogetherSharePage({
         </div>
       </div>
 
+      {/* Hidden pre-warm for the OG (used in link-preview metadata). The
+          story preview above already triggers a story render in the
+          foreground, so by the time the user taps Save / Share, the CDN
+          has cached both sizes (Cache-Control: s-maxage=300). */}
       <div aria-hidden="true" style={{ display: "none" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={ogSrc} alt="" width={1} height={1} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={squareSrc} alt="" width={1} height={1} />
       </div>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-          Share
+          Share image
         </h2>
+        <DownloadButton
+          href={storySrc}
+          filename={`${usernames.join("-")}-${list}-story.png`}
+          shareText={decodeURIComponent(text)}
+          shareUrl={`/share/together/${usernames.join("/")}/${list}${mode === "either" ? "?mode=either" : ""}`}
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-gold px-4 py-4 text-center text-base font-semibold text-black transition hover:bg-gold-dim"
+        >
+          <ShareIcon size={18} />
+          Share
+        </DownloadButton>
+      </section>
+
+      <section className="flex flex-col gap-3 border-t border-zinc-900 pt-5">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          Or post the link
+        </h2>
+        <p className="text-xs text-zinc-500">
+          X and Threads auto-render the gold link-preview card from this
+          page — cleaner for tweets / Threads posts where you don&apos;t
+          want a raw image attachment.
+        </p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <a
             href={xUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded-md bg-gold px-4 py-3 text-center font-semibold text-black hover:bg-gold-dim"
+            className="rounded-md border border-zinc-700 px-4 py-2.5 text-center text-sm text-zinc-300 transition hover:border-gold hover:text-gold"
           >
-            Share on X (Twitter)
+            Share on X
           </a>
           <a
             href={threadsUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded-md border border-gold px-4 py-3 text-center font-semibold text-gold hover:bg-gold/10"
+            className="rounded-md border border-zinc-700 px-4 py-2.5 text-center text-sm text-zinc-300 transition hover:border-gold hover:text-gold"
           >
             Share on Threads
           </a>
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-          Download image
-        </h2>
-        <p className="text-xs text-zinc-600">
-          For Instagram / TikTok where link previews don&apos;t work — download
-          the PNG and upload it directly.
-        </p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <DownloadButton
-            href={squareSrc}
-            filename={`${usernames.join("-")}-${list}-square.png`}
-            className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
-          >
-            📸 IG Square (1080×1080)
-          </DownloadButton>
-          <DownloadButton
-            href={storySrc}
-            filename={`${usernames.join("-")}-${list}-story.png`}
-            className="rounded-md border border-zinc-700 px-4 py-3 text-center text-sm hover:border-gold hover:text-gold"
-          >
-            📱 IG Story (1080×1920)
-          </DownloadButton>
         </div>
       </section>
     </main>
