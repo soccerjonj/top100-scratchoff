@@ -17,9 +17,13 @@ export const LISTS: Record<ListId, ListMeta> = {
   "imdb-top-100": {
     title: "IMDB Top 100 Fan Favorites",
     entries: imdbTop100 as FilmEntry[],
-    // IMDB's fan-favorite chart, the original source for the scratch-off poster.
-    sourceUrl: "https://www.imdb.com/chart/top/",
-    sourceLabel: "View on IMDB",
+    // The IMDb-curated Top 100 mirrored from the Curious Charts ×
+    // IMDb scratch-off poster (curiouscharts.com/products/official-
+    // imdb-top-100-movies-scratch-off-poster…). The closest IMDb-
+    // hosted mirror is the "Top 100 Poster" user list maintained at
+    // ls082915895 — same 100 films, in rank order.
+    sourceUrl: "https://www.imdb.com/list/ls082915895/",
+    sourceLabel: "View on IMDb",
   },
   "afi-top-100": {
     title: "AFI 100 Years…100 Movies",
