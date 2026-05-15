@@ -3,7 +3,7 @@ import { getUser, normalizeUsername } from "@/lib/user";
 import { LISTS } from "@/lib/lists";
 import type { ListId } from "@/types";
 
-export const alt = "Top 100 Scratch-Off — watched-films share image";
+export const alt = "Wellwatched — watched-films share image";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

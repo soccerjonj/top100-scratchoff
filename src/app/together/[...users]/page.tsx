@@ -5,7 +5,8 @@ import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { TogetherSwitcher } from "@/components/TogetherSwitcher";
 import { TogetherShareButton } from "@/components/TogetherShareButton";
 import { RememberMe } from "@/components/RememberMe";
-import type { ListId, UserRecord } from "@/types";
+import { getCustomListsForUser } from "@/lib/custom-list";
+import type { CustomListRecord, ListId, UserRecord } from "@/types";
 import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
 
@@ -27,6 +28,7 @@ function isListId(v: string | undefined): v is ListId {
 function isMode(v: string | undefined): v is Mode {
   return v === "both" || v === "either";
 }
+const isCustomId = (v: string): boolean => /^[0-9a-f]{16}$/.test(v);
 
 export default async function TogetherPage({
   params,
@@ -46,7 +48,14 @@ export default async function TogetherPage({
     if (!/^[a-z0-9_-]+$/.test(u)) notFound();
   }
 
-  const activeList: ListId = isListId(list) ? list : "imdb-top-100";
+  // Active list can be a built-in or a custom-list id. The switcher
+  // validates against the actual set at render time.
+  const rawListClean = typeof list === "string" ? list : "";
+  const activeList: string = isListId(list)
+    ? list
+    : isCustomId(rawListClean)
+      ? rawListClean
+      : "imdb-top-100";
   const mode: Mode = isMode(rawMode) ? rawMode : "both";
   const density: Density = rawDensity === "comfy" ? "comfy" : "dense";
 
@@ -66,9 +75,28 @@ export default async function TogetherPage({
     Array.from(effectiveWatchedSet(r)),
   );
 
+  // Union of every participant's pinned custom lists. If two users have
+  // the same list pinned, getCustomListsForUser is naturally deduped
+  // because Mongo returns a single record per id.
+  const allCustomListIds = Array.from(
+    new Set(records.flatMap((r) => r.customListIds ?? [])),
+  );
+  const customLists: CustomListRecord[] =
+    allCustomListIds.length > 0
+      ? await getCustomListsForUser(allCustomListIds)
+      : [];
+
+  // Custom-list share image isn't supported yet, so the Share button
+  // falls back to imdb-top-100 whenever a custom list is active.
+  const sharableList: ListId = isListId(list) ? list : "imdb-top-100";
+
   return (
     <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
-      <RememberMe username={usernames[0]} partner={usernames[1]} />
+      <RememberMe
+        username={usernames[0]}
+        partner={usernames[1]}
+        group={usernames}
+      />
       <header className="mb-4 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-bold sm:text-2xl">
@@ -96,7 +124,7 @@ export default async function TogetherPage({
         <div className="flex shrink-0 items-center gap-3">
           <TogetherShareButton
             usernames={usernames}
-            initialList={activeList}
+            initialList={sharableList}
             initialMode={mode}
           />
           <Link href="/" className="hidden text-sm text-zinc-400 hover:text-gold sm:inline">
@@ -137,6 +165,7 @@ export default async function TogetherPage({
         initialList={activeList}
         initialMode={mode}
         initialDensity={density}
+        customLists={customLists}
       />
     </main>
   );

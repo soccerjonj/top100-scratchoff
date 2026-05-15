@@ -118,7 +118,7 @@ function layout(ctx: TemplateContext): ReactElement {
             fontWeight: 700,
           }}
         >
-          A scratch-off score
+          Wellwatched score
         </div>
         <div
           style={{
@@ -238,7 +238,7 @@ function layout(ctx: TemplateContext): ReactElement {
         >
           <span style={{ color: TEXT }}>{ctx.username}</span>
           <span style={{ color: GOLD_DIM }}>·</span>
-          <span>top100scratchoff.com</span>
+          <span>wellwatched.app</span>
         </div>
       </div>
     </div>

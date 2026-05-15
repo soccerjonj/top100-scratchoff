@@ -179,7 +179,7 @@ export function PosterGrid({
                   height: "100%",
                   objectFit: "cover",
                   filter: watched
-                    ? "saturate(1.35) contrast(1.1) brightness(1.05)"
+                    ? "saturate(1.08) contrast(1.04)"
                     : "grayscale(100%) brightness(0.26)",
                   opacity: watched ? 1 : 0.42,
                 }}

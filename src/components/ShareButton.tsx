@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ShareIcon } from "./ShareIcon";
 
 const BUILT_IN: ReadonlySet<string> = new Set([
   "imdb-top-100",
@@ -65,9 +66,10 @@ export function ShareButton({
   return (
     <Link
       href={`/share/${username}/${shareList}`}
-      className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
     >
-      ✨ Share
+      <ShareIcon size={15} />
+      Share
     </Link>
   );
 }

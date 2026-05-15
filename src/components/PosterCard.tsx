@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type CSSProperties,
+} from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FilmEntry } from "@/types";
 
 interface MovieDetails {
@@ -15,6 +22,15 @@ interface MovieDetails {
   posterPath: string | null;
   backdropPath: string | null;
 }
+
+// Sparkle particles emitted on watched flip. Pre-baked offsets give a
+// natural spread without needing Math.random at render time.
+const SPARKLES: ReadonlyArray<{ dx: number; dy: number; delay: number; dur: number }> = [
+  { dx: -28, dy: -42, delay: 0,   dur: 720 },
+  { dx:  32, dy: -38, delay: 50,  dur: 780 },
+  { dx: -14, dy: -54, delay: 110, dur: 700 },
+  { dx:  18, dy: -28, delay: 160, dur: 760 },
+];
 
 export function PosterCard({
   entry,
@@ -34,7 +50,9 @@ export function PosterCard({
   ownerUsername?: string | string[];
 }) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [details, setDetails] = useState<MovieDetails | null>(null);
   const [loadState, setLoadState] = useState<"idle" | "loading" | "error">(
     "idle",
@@ -47,9 +65,33 @@ export function PosterCard({
   const [toggling, setToggling] = useState(false);
   const effectiveWatched = optimisticWatched ?? watched;
 
+  // Re-mount key for the modal contents so the spring entrance plays
+  // every time the dialog opens (not just the first time).
+  const [openCount, setOpenCount] = useState(0);
+
+  // Track watched flips for the celebration overlay. Mount the sheen +
+  // sparkles for ~750ms whenever effectiveWatched goes false → true.
+  const prevWatchedRef = useRef(effectiveWatched);
+  const [celebrate, setCelebrate] = useState(false);
+  // Distinguish user-initiated toggles from passive state changes
+  // (e.g. a parent re-render after data sync) so we don't fire the
+  // badge animation on initial mount when watched is already true.
+  const [badgeToggled, setBadgeToggled] = useState(false);
+
+  useEffect(() => {
+    if (!prevWatchedRef.current && effectiveWatched && !reduceMotion) {
+      setCelebrate(true);
+      const t = setTimeout(() => setCelebrate(false), 800);
+      prevWatchedRef.current = effectiveWatched;
+      return () => clearTimeout(t);
+    }
+    prevWatchedRef.current = effectiveWatched;
+  }, [effectiveWatched, reduceMotion]);
+
   async function openDialog() {
     const d = dialogRef.current;
     if (!d) return;
+    setOpenCount((n) => n + 1);
     d.showModal();
     if (!details && entry.tmdbId && loadState === "idle") {
       setLoadState("loading");
@@ -79,19 +121,27 @@ export function PosterCard({
   useEffect(() => {
     const d = dialogRef.current;
     if (!d) return;
-    function lock() {
-      document.body.style.overflow = "hidden";
-    }
     function unlock() {
       document.body.style.overflow = "";
     }
-    // Native <dialog> has no close event in all browsers, polyfill via close listener.
     d.addEventListener("close", unlock);
     return () => {
       d.removeEventListener("close", unlock);
       unlock();
     };
   }, []);
+
+  // Cursor-tracked gold spotlight. We write CSS custom properties
+  // directly to the element so the gradient re-paints without React
+  // re-rendering on every mousemove.
+  function handleMouseMove(e: MouseEvent<HTMLButtonElement>) {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    el.style.setProperty("--mx", `${x}%`);
+    el.style.setProperty("--my", `${y}%`);
+  }
 
   const lbHref = `https://letterboxd.com/film/${entry.letterboxdSlug}/`;
   const bigPosterSrc = entry.posterPath
@@ -109,6 +159,7 @@ export function PosterCard({
     if (ownerList.length === 0 || toggling) return;
     const next = !effectiveWatched;
     setOptimisticWatched(next);
+    setBadgeToggled(true);
     setToggling(true);
     try {
       const results = await Promise.all(
@@ -138,14 +189,16 @@ export function PosterCard({
   return (
     <>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => {
           openDialog();
           document.body.style.overflow = "hidden";
         }}
+        onMouseMove={handleMouseMove}
         className={[
           "poster-card group relative block aspect-[2/3] overflow-hidden rounded-md ring-1 ring-zinc-800 text-left",
-          watched ? "poster-watched hover:ring-gold" : "poster-unwatched hover:opacity-90",
+          watched ? "poster-watched hover:ring-gold" : "poster-unwatched",
         ].join(" ")}
         title={`${entry.title} (${entry.year})`}
       >
@@ -166,13 +219,39 @@ export function PosterCard({
             no poster
           </div>
         )}
-        <div className="absolute left-0.5 top-0.5 rounded bg-black/70 px-1 py-0 text-[8px] font-semibold text-gold sm:left-1 sm:top-1 sm:px-1.5 sm:py-0.5 sm:text-[10px]">
+        {/* Cursor-tracked gold spotlight overlay (pointer-only, CSS-driven) */}
+        <span className="poster-spotlight" aria-hidden />
+
+        <div className="poster-rank absolute left-0.5 top-0.5 z-[2] rounded bg-black/70 px-1 py-0 text-[8px] font-semibold text-gold sm:left-1 sm:top-1 sm:px-1.5 sm:py-0.5 sm:text-[10px]">
           #{entry.rank}
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="poster-title pointer-events-none absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-black/90 to-transparent p-2">
           <div className="truncate text-xs font-medium">{entry.title}</div>
           <div className="text-[10px] text-zinc-400">{entry.year}</div>
         </div>
+
+        {/* Watched-flip celebration: sheen sweep + sparkles. Mounted only
+            while `celebrate` is true (≈750ms), then unmounts cleanly. */}
+        {celebrate && (
+          <>
+            <span className="poster-sheen" aria-hidden />
+            {SPARKLES.map((s, i) => (
+              <span
+                key={i}
+                className="poster-sparkle"
+                aria-hidden
+                style={
+                  {
+                    "--dx": `${s.dx}px`,
+                    "--dy": `${s.dy}px`,
+                    "--delay": `${s.delay}ms`,
+                    "--dur": `${s.dur}ms`,
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </>
+        )}
       </button>
 
       <dialog
@@ -180,9 +259,21 @@ export function PosterCard({
         onClick={handleDialogClick}
         className="movie-dialog m-auto w-[min(640px,calc(100vw-1rem))] rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
       >
-        <div className="flex max-h-[85vh] overflow-hidden">
+        <motion.div
+          key={openCount}
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.94, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 340,
+            damping: 28,
+            mass: 0.6,
+          }}
+          className="flex max-h-[85vh] overflow-hidden"
+        >
           {/* Poster column — small fixed width on mobile, larger on desktop. */}
-          <div className="relative aspect-[2/3] w-24 shrink-0 self-start bg-zinc-900 sm:w-56">
+          <div className="relative aspect-[2/3] w-24 shrink-0 self-start overflow-hidden bg-zinc-900 sm:w-56">
+            <span className="modal-spotlight" aria-hidden />
             {bigPosterSrc ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
@@ -227,7 +318,7 @@ export function PosterCard({
               <button
                 type="button"
                 onClick={closeDialog}
-                className="shrink-0 rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-foreground"
+                className="shrink-0 rounded-md p-1 text-zinc-400 transition hover:bg-zinc-800 hover:text-foreground"
                 aria-label="Close"
               >
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
@@ -237,15 +328,55 @@ export function PosterCard({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {effectiveWatched ? (
-                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold">
-                  ✨ Watched
-                </div>
-              ) : (
-                <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
-                  Not watched yet
-                </div>
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                {effectiveWatched ? (
+                  <motion.div
+                    key="watched"
+                    initial={
+                      badgeToggled && !reduceMotion
+                        ? { scale: 0.7, opacity: 0 }
+                        : false
+                    }
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={reduceMotion ? undefined : { scale: 0.85, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 460, damping: 24 }}
+                    className="inline-flex w-fit items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-xs font-semibold text-gold"
+                  >
+                    <motion.svg
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      <motion.path
+                        d="M5 13l4 4L19 7"
+                        initial={
+                          badgeToggled && !reduceMotion
+                            ? { pathLength: 0, opacity: 0 }
+                            : false
+                        }
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 0.32, ease: "easeOut", delay: 0.08 }}
+                      />
+                    </motion.svg>
+                    Watched
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="unwatched"
+                    initial={false}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="inline-flex w-fit items-center gap-1.5 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400"
+                  >
+                    Not watched yet
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {ownerList.length > 0 && (
                 <button
                   type="button"
@@ -313,20 +444,20 @@ export function PosterCard({
                 href={lbHref}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 rounded-md bg-gold px-3 py-2 text-center text-xs font-semibold text-black hover:bg-gold-dim sm:px-4 sm:py-2.5 sm:text-sm"
+                className="flex-1 rounded-md bg-gold px-3 py-2 text-center text-xs font-semibold text-black transition hover:bg-gold-dim sm:px-4 sm:py-2.5 sm:text-sm"
               >
                 View on Letterboxd ↗
               </a>
               <button
                 type="button"
                 onClick={closeDialog}
-                className="rounded-md border border-zinc-700 px-3 py-2 text-center text-xs text-zinc-300 hover:border-zinc-500 sm:px-4 sm:py-2.5 sm:text-sm"
+                className="rounded-md border border-zinc-700 px-3 py-2 text-center text-xs text-zinc-300 transition hover:border-zinc-500 sm:px-4 sm:py-2.5 sm:text-sm"
               >
                 Close
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </dialog>
     </>
   );

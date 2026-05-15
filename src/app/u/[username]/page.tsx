@@ -8,7 +8,7 @@ import { RememberMe } from "@/components/RememberMe";
 import { ShareButton } from "@/components/ShareButton";
 import { getCustomListsForUser } from "@/lib/custom-list";
 import { CsvUpload } from "@/components/CsvUpload";
-import { ComparePartnerForm } from "@/components/ComparePartnerForm";
+import { GroupPanel } from "@/components/GroupPanel";
 import type { ListId } from "@/types";
 import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
@@ -22,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username: raw } = await params;
   const username = normalizeUsername(raw);
-  const title = `${username} · Top 100 Scratch-Off`;
+  const title = `${username} · Wellwatched`;
   const description = `Which films from the IMDB Top 100, AFI Top 100, NYT 100 Best of the 21st Century, and Letterboxd's Top 500 has ${username} watched?`;
   const ogImage = `/api/share-image/${username}/imdb-top-100?size=og`;
   return {
@@ -132,6 +132,8 @@ export default async function UserPage({
         </a>
       )}
 
+      <GroupPanel self={username} />
+
       <ListSwitcher
         initialList={activeList}
         initialDensity={density}
@@ -158,7 +160,6 @@ export default async function UserPage({
           </Link>
         </div>
         <CsvUpload username={username} hasCsv={hasCsv} />
-        <ComparePartnerForm self={username} />
       </footer>
     </main>
   );

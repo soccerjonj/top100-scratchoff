@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { LISTS } from "@/lib/lists";
 import type { CustomListRecord, FilmEntry, ListId } from "@/types";
 import { PosterGrid, type Density } from "./PosterGrid";
@@ -154,14 +155,27 @@ export function ListSwitcher({
               type="button"
               onClick={() => activateList(l.id)}
               className={[
-                "shrink-0 rounded-full border px-3 py-1.5 text-xs transition sm:px-4 sm:text-sm",
+                "relative shrink-0 rounded-full border px-3 py-1.5 text-xs transition sm:px-4 sm:text-sm",
                 isActive
-                  ? "border-gold bg-gold/10 text-gold"
+                  ? "border-transparent text-gold"
                   : "border-zinc-700 text-zinc-400 hover:border-gold/50 hover:text-gold/80",
               ].join(" ")}
             >
-              <span className="sm:hidden">{l.shortTitle}</span>
-              <span className="hidden sm:inline">{l.title}</span>
+              {isActive && (
+                <motion.span
+                  layoutId="active-list-tab"
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border border-gold bg-gold/10"
+                  transition={{
+                    type: "spring",
+                    stiffness: 380,
+                    damping: 32,
+                    mass: 0.6,
+                  }}
+                />
+              )}
+              <span className="relative z-10 sm:hidden">{l.shortTitle}</span>
+              <span className="relative z-10 hidden sm:inline">{l.title}</span>
             </button>
           );
         })}
@@ -210,13 +224,28 @@ export function ListSwitcher({
                 type="button"
                 onClick={() => activateDensity(d)}
                 className={[
-                  "rounded-md border px-2 py-1",
+                  "relative rounded-md border px-2 py-1",
                   active
-                    ? "border-gold bg-gold/10 text-gold"
+                    ? "border-transparent text-gold"
                     : "border-zinc-700 text-zinc-400 hover:border-gold/50",
                 ].join(" ")}
               >
-                {d === "comfy" ? "Comfy" : "Dense"}
+                {active && (
+                  <motion.span
+                    layoutId="active-density-tab"
+                    aria-hidden
+                    className="absolute inset-0 rounded-md border border-gold bg-gold/10"
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 32,
+                      mass: 0.6,
+                    }}
+                  />
+                )}
+                <span className="relative z-10">
+                  {d === "comfy" ? "Comfy" : "Dense"}
+                </span>
               </button>
             );
           })}
@@ -230,25 +259,35 @@ export function ListSwitcher({
         total={activeList.entries.length}
       />
 
-      {/* All grids rendered, only the active one visible. */}
-      {lists.map((l) => {
-        const visible = l.id === activeId;
-        return (
-          <div
-            key={l.id}
-            style={{ display: visible ? undefined : "none" }}
-            aria-hidden={!visible}
-          >
-            <PosterGrid
-              entries={l.entries}
-              watchedSet={watchedSet}
-              density={density}
-              listTitle={l.title}
-              ownerUsername={ownerUsername}
-            />
-          </div>
-        );
-      })}
+      {/* Grid area with a subtle gold flash overlay that remounts on tab
+          change, giving the swap a moment of attention without forcing
+          the heavy poster grids to remount. */}
+      <div className="relative">
+        <div
+          key={`flash-${activeId}`}
+          className="tab-switch-flash absolute inset-x-0 top-0 z-10 h-32"
+          aria-hidden
+        />
+        {/* All grids rendered, only the active one visible. */}
+        {lists.map((l) => {
+          const visible = l.id === activeId;
+          return (
+            <div
+              key={l.id}
+              style={{ display: visible ? undefined : "none" }}
+              aria-hidden={!visible}
+            >
+              <PosterGrid
+                entries={l.entries}
+                watchedSet={watchedSet}
+                density={density}
+                listTitle={l.title}
+                ownerUsername={ownerUsername}
+              />
+            </div>
+          );
+        })}
+      </div>
 
       <PosterPreloader
         activeListId={
