@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
-import { ListView } from "@/components/ListView";
+import { TogetherSwitcher } from "@/components/TogetherSwitcher";
+import { TogetherShareButton } from "@/components/TogetherShareButton";
 import { RememberMe } from "@/components/RememberMe";
 import type { ListId, UserRecord } from "@/types";
 import { effectiveWatchedSet } from "@/types";
@@ -25,17 +26,6 @@ function isListId(v: string | undefined): v is ListId {
 }
 function isMode(v: string | undefined): v is Mode {
   return v === "both" || v === "either";
-}
-
-function intersect(sets: Set<string>[]): string[] {
-  if (sets.length === 0) return [];
-  const [first, ...rest] = sets;
-  return Array.from(first).filter((s) => rest.every((r) => r.has(s)));
-}
-function union(sets: Set<string>[]): string[] {
-  const out = new Set<string>();
-  for (const s of sets) for (const v of s) out.add(v);
-  return Array.from(out);
 }
 
 export default async function TogetherPage({
@@ -70,29 +60,28 @@ export default async function TogetherPage({
     }
   }
 
-  const sets = records.map((r) => effectiveWatchedSet(r));
-  const slugs = mode === "both" ? intersect(sets) : union(sets);
-  const headline = mode === "both" ? "both watched" : "either watched";
-
-  const base = `/together/${usernames.join("/")}`;
+  // Per-user effective watched arrays — TogetherSwitcher does the
+  // intersect/union client-side as the user flips mode.
+  const userWatched = records.map((r) =>
+    Array.from(effectiveWatchedSet(r)),
+  );
 
   return (
-    <main className="mx-auto max-w-[1800px] px-4 py-8">
+    <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
       <RememberMe username={usernames[0]} partner={usernames[1]} />
-      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">
+      <header className="mb-4 flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-xl font-bold sm:text-2xl">
             {usernames.map((u, i) => (
               <span key={u}>
-                {i > 0 && <span className="text-zinc-600"> + </span>}
+                {i > 0 && <span className="text-zinc-600"> × </span>}
                 <Link href={`/u/${u}`} className="text-gold hover:underline">
                   {u}
                 </Link>
               </span>
             ))}
           </h1>
-          <p className="text-sm text-zinc-500">
-            {slugs.length.toLocaleString()} films {headline} ·{" "}
+          <p className="truncate text-xs text-zinc-500 sm:text-sm">
             {records.map((r, i) => (
               <span key={r.username}>
                 {i > 0 && " · "}
@@ -104,71 +93,50 @@ export default async function TogetherPage({
             ))}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/share/together/${usernames.join("/")}/${activeList}${mode === "either" ? "?mode=either" : ""}`}
-            className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
-          >
-            ✨ Share
-          </Link>
-          <Link href="/" className="text-sm text-zinc-400 hover:text-gold">
+        <div className="flex shrink-0 items-center gap-3">
+          <TogetherShareButton
+            usernames={usernames}
+            initialList={activeList}
+            initialMode={mode}
+          />
+          <Link href="/" className="hidden text-sm text-zinc-400 hover:text-gold sm:inline">
             ← start over
           </Link>
         </div>
       </header>
 
-      <nav className="mb-4 flex flex-wrap gap-2">
-        {(["both", "either"] as const).map((m) => {
-          const params = new URLSearchParams();
-          params.set("mode", m);
-          if (list) params.set("list", list);
-          if (density === "comfy") params.set("density", density);
-          const href = `${base}?${params.toString()}`;
-          return (
-            <Link
-              key={m}
-              href={href}
-              scroll={false}
-              className={[
-                "rounded-full border px-3 py-1 text-xs transition",
-                mode === m
-                  ? "border-gold bg-gold/10 text-gold"
-                  : "border-zinc-700 text-zinc-400 hover:border-gold/50",
-              ].join(" ")}
-            >
-              {m === "both" ? "Both watched" : "Either watched"}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="mb-6 text-xs text-zinc-500">
-        {records.some((r) => !r.csvUploadedAt) && (
-          <>
-            Some users haven&apos;t imported their full Letterboxd history yet.{" "}
-            {records
-              .filter((r) => !r.csvUploadedAt)
-              .map((r) => (
+      {records.some((r) => !r.csvUploadedAt) && (
+        <div className="mb-4 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-zinc-300">
+          {records
+            .filter((r) => !r.csvUploadedAt)
+            .map((r) => r.username)
+            .join(" and ")}{" "}
+          {records.filter((r) => !r.csvUploadedAt).length === 1
+            ? "hasn't"
+            : "haven't"}{" "}
+          uploaded their full Letterboxd history yet —{" "}
+          {records
+            .filter((r) => !r.csvUploadedAt)
+            .map((r, i, arr) => (
+              <span key={r.username}>
                 <Link
-                  key={r.username}
                   href={`/u/${r.username}`}
-                  className="mr-2 text-gold underline"
+                  className="text-gold underline-offset-2 hover:underline"
                 >
                   upload {r.username}&apos;s CSV
                 </Link>
-              ))}
-          </>
-        )}
-      </div>
+                {i < arr.length - 1 && " · "}
+              </span>
+            ))}
+        </div>
+      )}
 
-      <ListView
-        activeList={activeList}
-        watchedSlugs={slugs}
-        username={usernames.join("/")}
-        basePath={base}
-        density={density}
-        extraParams={{ mode }}
-        ownerUsername={usernames}
+      <TogetherSwitcher
+        usernames={usernames}
+        userWatched={userWatched}
+        initialList={activeList}
+        initialMode={mode}
+        initialDensity={density}
       />
     </main>
   );
