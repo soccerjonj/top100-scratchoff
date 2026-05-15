@@ -39,19 +39,28 @@ export function PreviewWithProgress({
       return;
     }
 
-    // Animate 0 → 95 over ~14s with ease-out (decelerating). Frequent
-    // updates so the bar feels alive without burning CPU.
+    // Asymptotic curve: percent = 99 * (1 - exp(-t / tau)). Unlike the
+    // previous ease-out-then-plateau approach, this never stops moving
+    // — it just creeps slower and slower past 90%, so a render that
+    // takes 30-60s still shows visible progress all the way through.
+    //
+    // tau=9s shape (matches typical 15-30s real renders):
+    //   t=5s  → 43%
+    //   t=10s → 67%
+    //   t=15s → 81%
+    //   t=20s → 89%
+    //   t=30s → 96%
+    //   t=45s → 98%
+    //   t=60s → 99%
     const startedAt = performance.now();
-    const TARGET = 95;
-    const DURATION = 14_000;
+    const TAU = 9_000;
+    const CAP = 99;
     const tick = () => {
       const elapsed = performance.now() - startedAt;
-      const t = Math.min(elapsed / DURATION, 1);
-      // cubic ease-out: 1 - (1-t)^3
-      const eased = 1 - Math.pow(1 - t, 3);
-      setPct(eased * TARGET);
+      const pct = CAP * (1 - Math.exp(-elapsed / TAU));
+      setPct(pct);
     };
-    const id = window.setInterval(tick, 80);
+    const id = window.setInterval(tick, 120);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
@@ -94,7 +103,7 @@ export function PreviewWithProgress({
           <div className="text-xs font-semibold tabular-nums text-gold">
             {Math.round(pct)}%
           </div>
-          {pct >= 94 && !loaded && (
+          {pct >= 88 && !loaded && (
             <div className="text-[10px] text-zinc-600">
               Almost there — high-res posters take a moment
             </div>

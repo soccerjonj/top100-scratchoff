@@ -5,6 +5,7 @@ import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListSwitcher } from "@/components/ListSwitcher";
 import { RememberMe } from "@/components/RememberMe";
+import { ShareButton } from "@/components/ShareButton";
 import { getCustomListsForUser } from "@/lib/custom-list";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
@@ -111,12 +112,7 @@ export default async function UserPage({
             {hasCsv ? "" : " · page 1 only"}
           </p>
         </div>
-        <Link
-          href={`/share/${username}/${sharableList}`}
-          className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
-        >
-          ✨ Share
-        </Link>
+        <ShareButton username={username} initialList={sharableList} />
       </header>
 
       {!hasCsv && (

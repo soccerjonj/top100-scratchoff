@@ -104,6 +104,13 @@ export function ListSwitcher({
     if (id === activeId) return;
     setActiveId(id);
     updateUrl({ list: id });
+    // Notify other client components (e.g. ShareButton) that the
+    // active list changed so they can update their hrefs without a
+    // full re-render. history.replaceState alone doesn't fire any
+    // built-in event other clients can subscribe to.
+    window.dispatchEvent(
+      new CustomEvent("top100:listchange", { detail: { id } }),
+    );
   }
 
   function activateDensity(d: Density) {
