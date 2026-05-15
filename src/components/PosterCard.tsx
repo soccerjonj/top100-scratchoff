@@ -167,11 +167,11 @@ export function PosterCard({
       <dialog
         ref={dialogRef}
         onClick={handleDialogClick}
-        className="movie-dialog m-auto w-[min(640px,calc(100vw-2rem))] rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
+        className="movie-dialog m-auto w-[min(640px,calc(100vw-1rem))] rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
       >
-        <div className="flex max-h-[90vh] flex-col overflow-hidden sm:flex-row">
-          {/* Poster column */}
-          <div className="relative aspect-[2/3] w-full shrink-0 bg-zinc-900 sm:w-64">
+        <div className="flex max-h-[85vh] overflow-hidden">
+          {/* Poster column — small fixed width on mobile, larger on desktop. */}
+          <div className="relative aspect-[2/3] w-24 shrink-0 self-start bg-zinc-900 sm:w-56">
             {bigPosterSrc ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
@@ -180,23 +180,23 @@ export function PosterCard({
                 className="absolute inset-0 h-full w-full object-cover"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-zinc-700">
+              <div className="flex h-full items-center justify-center text-[10px] text-zinc-700">
                 no poster
               </div>
             )}
           </div>
 
           {/* Details column */}
-          <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto p-5 sm:max-h-[90vh]">
-            <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-2.5 overflow-y-auto p-3 sm:gap-3 sm:p-5">
+            <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="text-xs uppercase tracking-wider text-zinc-500">
+                <div className="text-[10px] uppercase tracking-wider text-zinc-500 sm:text-xs">
                   {listTitle ? `#${entry.rank} in ${listTitle}` : `#${entry.rank}`}
                 </div>
-                <h2 className="text-2xl font-bold leading-tight">
+                <h2 className="text-base font-bold leading-tight sm:text-2xl">
                   {entry.title}
                 </h2>
-                <div className="mt-1 text-sm text-zinc-400">
+                <div className="mt-0.5 text-xs text-zinc-400 sm:mt-1 sm:text-sm">
                   {entry.year}
                   {details?.runtime ? (
                     <>
@@ -219,7 +219,7 @@ export function PosterCard({
                 className="shrink-0 rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-foreground"
                 aria-label="Close"
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
                 </svg>
               </button>
@@ -258,20 +258,20 @@ export function PosterCard({
             )}
 
             {details?.tagline && (
-              <div className="text-sm italic text-zinc-400">
+              <div className="text-xs italic text-zinc-400 sm:text-sm">
                 &ldquo;{details.tagline}&rdquo;
               </div>
             )}
 
             {details?.overview ? (
-              <p className="text-sm leading-relaxed text-zinc-300">
+              <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">
                 {details.overview}
               </p>
             ) : loadState === "loading" ? (
               <div className="space-y-2">
-                <div className="h-3 w-full animate-pulse rounded bg-zinc-800" />
-                <div className="h-3 w-11/12 animate-pulse rounded bg-zinc-800" />
-                <div className="h-3 w-8/12 animate-pulse rounded bg-zinc-800" />
+                <div className="h-2.5 w-full animate-pulse rounded bg-zinc-800" />
+                <div className="h-2.5 w-11/12 animate-pulse rounded bg-zinc-800" />
+                <div className="h-2.5 w-8/12 animate-pulse rounded bg-zinc-800" />
               </div>
             ) : loadState === "error" ? (
               <p className="text-xs text-zinc-500">
@@ -292,19 +292,19 @@ export function PosterCard({
               </div>
             )}
 
-            <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row">
+            <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row sm:pt-2">
               <a
                 href={lbHref}
                 target="_blank"
                 rel="noreferrer"
-                className="flex-1 rounded-md bg-gold px-4 py-2.5 text-center text-sm font-semibold text-black hover:bg-gold-dim"
+                className="flex-1 rounded-md bg-gold px-3 py-2 text-center text-xs font-semibold text-black hover:bg-gold-dim sm:px-4 sm:py-2.5 sm:text-sm"
               >
                 View on Letterboxd ↗
               </a>
               <button
                 type="button"
                 onClick={closeDialog}
-                className="rounded-md border border-zinc-700 px-4 py-2.5 text-center text-sm text-zinc-300 hover:border-zinc-500"
+                className="rounded-md border border-zinc-700 px-3 py-2 text-center text-xs text-zinc-300 hover:border-zinc-500 sm:px-4 sm:py-2.5 sm:text-sm"
               >
                 Close
               </button>
