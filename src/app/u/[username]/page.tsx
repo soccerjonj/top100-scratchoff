@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListSwitcher } from "@/components/ListSwitcher";
+import { RememberMe } from "@/components/RememberMe";
 import { CsvUpload } from "@/components/CsvUpload";
 import { ComparePartnerForm } from "@/components/ComparePartnerForm";
 import type { ListId } from "@/types";
@@ -81,6 +82,7 @@ export default async function UserPage({
   return (
     <main className="mx-auto max-w-[1800px] px-3 py-4 sm:px-4 sm:py-8">
       <link rel="preload" as="image" href={preloadHref} />
+      <RememberMe username={username} />
 
       {/* Compact top row: identity + primary action (Share) */}
       <header className="mb-3 flex items-center justify-between gap-3 sm:mb-4">

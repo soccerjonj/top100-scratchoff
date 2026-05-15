@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getOrRefreshUser, normalizeUsername } from "@/lib/user";
 import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListView } from "@/components/ListView";
+import { RememberMe } from "@/components/RememberMe";
 import type { ListId, UserRecord } from "@/types";
 import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
@@ -77,6 +78,7 @@ export default async function TogetherPage({
 
   return (
     <main className="mx-auto max-w-[1800px] px-4 py-8">
+      <RememberMe username={usernames[0]} partner={usernames[1]} />
       <header className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
@@ -102,9 +104,17 @@ export default async function TogetherPage({
             ))}
           </p>
         </div>
-        <Link href="/" className="text-sm text-zinc-400 hover:text-gold">
-          ← start over
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/share/together/${usernames.join("/")}/${activeList}${mode === "either" ? "?mode=either" : ""}`}
+            className="shrink-0 rounded-md bg-gold px-3 py-2 text-sm font-semibold text-black hover:bg-gold-dim sm:px-4"
+          >
+            ✨ Share
+          </Link>
+          <Link href="/" className="text-sm text-zinc-400 hover:text-gold">
+            ← start over
+          </Link>
+        </div>
       </header>
 
       <nav className="mb-4 flex flex-wrap gap-2">

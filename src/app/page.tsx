@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UsernameForm } from "@/components/UsernameForm";
+import { ContinueShortcut } from "@/components/ContinueShortcut";
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
         from the IMDB Top 100, AFI 100, NYT 21st-Century 100, and Letterboxd
         Top 500. Updated daily.
       </p>
+      <ContinueShortcut />
       <UsernameForm />
       <p className="text-xs text-zinc-600">
         Your username is public. We scrape your public /films page only.
