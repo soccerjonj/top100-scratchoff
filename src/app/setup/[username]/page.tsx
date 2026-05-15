@@ -57,11 +57,21 @@ export default async function SetupPage({ params }: { params: Params }) {
           Welcome, <span className="text-gold">{username}</span>
         </h1>
         <p className="text-sm text-zinc-400">
-          One quick setup to import your full Letterboxd history. You only need
-          to do this once. After that, every visit auto-refreshes your latest
-          watches.
+          Import your full Letterboxd history once and you&apos;re done — every
+          new film you log on Letterboxd from here on shows up automatically.
         </p>
       </header>
+
+      {/* One-time + auto-from-then-on promise */}
+      <div className="flex items-start gap-3 rounded-lg border border-gold/30 bg-gold/5 px-4 py-3 text-sm">
+        <span className="text-lg leading-none">🔁</span>
+        <div className="text-zinc-300">
+          <strong className="text-gold">One-time setup.</strong> After you
+          upload your CSV, we&apos;ll auto-check Letterboxd for new watches
+          every time you visit. You never have to re-upload — new films just
+          appear.
+        </div>
+      </div>
 
       {/* Desktop-required notice */}
       <div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">

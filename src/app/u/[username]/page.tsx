@@ -110,8 +110,9 @@ export default async function UserPage({
         >
           <span className="text-zinc-300">
             Showing your <strong className="text-gold">72 most recent</strong>{" "}
-            watches. Upload <code className="text-gold">watched.csv</code> from
-            Letterboxd for your full history.
+            watches. Upload <code className="text-gold">watched.csv</code> once
+            for your full history — new films will appear automatically after
+            that.
           </span>
           <span className="rounded bg-gold px-3 py-1 font-semibold text-black">
             Upload CSV ↓
