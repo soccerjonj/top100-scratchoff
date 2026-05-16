@@ -204,7 +204,7 @@ function TakeoverScreen({ username }: { username: string }) {
             (they aren&apos;t yours)
           </li>
           <li>
-            Scrape your last ~72 Letterboxd watches as a starting point
+            Sync your last ~72 Letterboxd watches as a starting point
           </li>
         </ul>
       </div>
