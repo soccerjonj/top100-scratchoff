@@ -329,19 +329,6 @@ html, body {
 }
 
 
-/* Modal: gold ambience behind the poster column */
-.modal-spotlight {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 75% 55% at 50% 50%,
-    rgba(212, 175, 55, 0.18),
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-}
-
 /* Grid density. Mobile gets tighter minmax so far more posters fit on screen.
    Dense on a 375px viewport with 12px page padding + 6px gap = ~9 cols.
    Comfy gives 4 cols on the same viewport. */
