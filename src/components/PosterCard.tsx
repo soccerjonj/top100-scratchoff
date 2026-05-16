@@ -257,7 +257,7 @@ export function PosterCard({
       <dialog
         ref={dialogRef}
         onClick={handleDialogClick}
-        className="movie-dialog m-auto w-[min(640px,calc(100vw-1rem))] rounded-xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
+        className="movie-dialog m-auto w-[min(560px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-0 text-foreground shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-sm"
       >
         <motion.div
           key={openCount}
@@ -269,64 +269,90 @@ export function PosterCard({
             damping: 28,
             mass: 0.6,
           }}
-          className="flex max-h-[85vh] overflow-hidden"
+          className="flex max-h-[88vh] flex-col overflow-hidden"
         >
-          {/* Poster column — small fixed width on mobile, larger on desktop. */}
-          <div className="relative aspect-[2/3] w-24 shrink-0 self-start overflow-hidden bg-zinc-900 sm:w-56">
-            <span className="modal-spotlight" aria-hidden />
-            {bigPosterSrc ? (
+          {/* HERO — the film's own backdrop, full-bleed, with a scrim that
+              fades into the body. Falls back to a blurred poster until the
+              backdrop loads (or permanently when a film has no backdrop),
+              then to a gold gradient if there's no art at all. */}
+          <div className="relative aspect-[16/9] w-full shrink-0 bg-zinc-900">
+            {details?.backdropPath ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={`https://image.tmdb.org/t/p/w780${details.backdropPath}`}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : bigPosterSrc ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={bigPosterSrc}
-                alt={`${entry.title} poster`}
-                className="absolute inset-0 h-full w-full object-cover"
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-[10px] text-zinc-700">
-                no poster
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-gold/20 via-zinc-900 to-zinc-950" />
             )}
+            {/* Scrim → blends the backdrop into the solid body */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/55 to-zinc-950/5" />
+            <button
+              type="button"
+              onClick={closeDialog}
+              aria-label="Close"
+              className="absolute right-3 top-3 z-10 rounded-full bg-black/45 p-1.5 text-white/90 backdrop-blur-sm transition hover:bg-black/70 hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+              </svg>
+            </button>
           </div>
 
-          {/* Details column */}
-          <div className="flex min-w-0 flex-1 flex-col gap-2.5 overflow-y-auto p-3 sm:gap-3 sm:p-5">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-wider text-zinc-500 sm:text-xs">
-                  {listTitle ? `#${entry.rank} in ${listTitle}` : `#${entry.rank}`}
+          {/* TITLE ROW — poster card overlaps the hero seam */}
+          <div className="relative z-10 -mt-16 flex items-end gap-3 px-4 sm:-mt-20 sm:gap-4 sm:px-6">
+            <div className="aspect-[2/3] w-20 shrink-0 overflow-hidden rounded-lg shadow-xl shadow-black/60 ring-1 ring-white/10 sm:w-28">
+              {bigPosterSrc ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={bigPosterSrc}
+                  alt={`${entry.title} poster`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-zinc-800 text-[10px] text-zinc-600">
+                  no poster
                 </div>
-                <h2 className="text-base font-bold leading-tight sm:text-2xl">
-                  {entry.title}
-                </h2>
-                <div className="mt-0.5 text-xs text-zinc-400 sm:mt-1 sm:text-sm">
-                  {entry.year}
-                  {details?.runtime ? (
-                    <>
-                      {" · "}
-                      {Math.floor(details.runtime / 60)}h {details.runtime % 60}m
-                    </>
-                  ) : null}
-                  {details?.voteAverage ? (
-                    <>
-                      {" · "}
-                      <span className="text-gold">★</span>{" "}
-                      {details.voteAverage.toFixed(1)}
-                    </>
-                  ) : null}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={closeDialog}
-                className="shrink-0 rounded-md p-1 text-zinc-400 transition hover:bg-zinc-800 hover:text-foreground"
-                aria-label="Close"
-              >
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-                </svg>
-              </button>
+              )}
             </div>
+            <div className="min-w-0 flex-1 pb-1">
+              <div className="text-[10px] font-medium uppercase tracking-wider text-gold/80 sm:text-xs">
+                {listTitle ? `#${entry.rank} · ${listTitle}` : `#${entry.rank}`}
+              </div>
+              <h2 className="font-display text-xl font-bold leading-tight sm:text-3xl">
+                {entry.title}
+              </h2>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-400 sm:text-sm">
+                <span>{entry.year}</span>
+                {details?.runtime ? (
+                  <>
+                    <span className="text-zinc-700">·</span>
+                    <span>
+                      {Math.floor(details.runtime / 60)}h {details.runtime % 60}m
+                    </span>
+                  </>
+                ) : null}
+                {details?.voteAverage ? (
+                  <span className="inline-flex items-center gap-1 rounded bg-gold/15 px-1.5 py-0.5 font-semibold text-gold">
+                    ★ {details.voteAverage.toFixed(1)}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </div>
 
+          {/* BODY — scrollable */}
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
             <div className="flex flex-wrap items-center gap-2">
               <AnimatePresence mode="wait" initial={false}>
                 {effectiveWatched ? (
@@ -377,41 +403,16 @@ export function PosterCard({
                   </motion.div>
                 )}
               </AnimatePresence>
-              {ownerList.length > 0 && (
-                <button
-                  type="button"
-                  onClick={toggleManualWatched}
-                  disabled={toggling}
-                  className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400 transition hover:border-gold/50 hover:text-gold disabled:opacity-50"
-                >
-                  {toggling
-                    ? "Saving…"
-                    : effectiveWatched
-                      ? isMultiOwner
-                        ? "Mark unwatched (both)"
-                        : "Mark unwatched"
-                      : isMultiOwner
-                        ? "✓ Mark both watched"
-                        : "✓ Mark watched"}
-                </button>
-              )}
             </div>
-            {ownerList.length > 0 && !watched && optimisticWatched === null && (
-              <p className="text-[10px] text-zinc-600">
-                {isMultiOwner
-                  ? `Marks save to both ${ownerList.join(" and ")} — handy when one of you forgot to log a film.`
-                  : "Manual marks save to your record — useful if you don't use Letterboxd or it's missing from your export."}
-              </p>
-            )}
 
             {details?.tagline && (
-              <div className="text-xs italic text-zinc-400 sm:text-sm">
+              <div className="border-l-2 border-gold/40 pl-3 text-sm italic text-zinc-300">
                 &ldquo;{details.tagline}&rdquo;
               </div>
             )}
 
             {details?.overview ? (
-              <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">
+              <p className="text-sm leading-relaxed text-zinc-300">
                 {details.overview}
               </p>
             ) : loadState === "loading" ? (
@@ -439,23 +440,52 @@ export function PosterCard({
               </div>
             )}
 
-            <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row sm:pt-2">
-              <a
-                href={lbHref}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 rounded-md bg-gold px-3 py-2 text-center text-xs font-semibold text-black transition hover:bg-gold-dim sm:px-4 sm:py-2.5 sm:text-sm"
-              >
-                View on Letterboxd ↗
-              </a>
-              <button
-                type="button"
-                onClick={closeDialog}
-                className="rounded-md border border-zinc-700 px-3 py-2 text-center text-xs text-zinc-300 transition hover:border-zinc-500 sm:px-4 sm:py-2.5 sm:text-sm"
-              >
-                Close
-              </button>
+            <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row">
+              {ownerList.length > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={toggleManualWatched}
+                    disabled={toggling}
+                    className="flex-1 rounded-lg bg-gold px-4 py-2.5 text-center text-sm font-semibold text-black transition hover:bg-gold-dim disabled:opacity-50"
+                  >
+                    {toggling
+                      ? "Saving…"
+                      : effectiveWatched
+                        ? isMultiOwner
+                          ? "Mark unwatched (both)"
+                          : "Mark unwatched"
+                        : isMultiOwner
+                          ? "✓ Mark both watched"
+                          : "✓ Mark watched"}
+                  </button>
+                  <a
+                    href={lbHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg border border-zinc-700 px-4 py-2.5 text-center text-sm text-zinc-300 transition hover:border-gold hover:text-gold"
+                  >
+                    Letterboxd ↗
+                  </a>
+                </>
+              ) : (
+                <a
+                  href={lbHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 rounded-lg bg-gold px-4 py-2.5 text-center text-sm font-semibold text-black transition hover:bg-gold-dim"
+                >
+                  View on Letterboxd ↗
+                </a>
+              )}
             </div>
+            {ownerList.length > 0 && !watched && optimisticWatched === null && (
+              <p className="text-[10px] text-zinc-600">
+                {isMultiOwner
+                  ? `Marks save to both ${ownerList.join(" and ")} — handy when one of you forgot to log a film.`
+                  : "Manual marks save to your record — useful if you don't use Letterboxd or it's missing from your export."}
+              </p>
+            )}
           </div>
         </motion.div>
       </dialog>
