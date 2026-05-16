@@ -33,6 +33,11 @@ html, body {
   z-index: 60;
   background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.55), transparent);
 }
+/* On phones a 1px line flush with the screen edge reads as a render
+   glitch rather than a frame — only show it on >= sm where it works. */
+@media (max-width: 639px) {
+  .page-hairline { display: none; }
+}
 
 /* Universal film-grain overlay — inline SVG noise on a fixed element so
    it costs one paint regardless of how many posters are on screen. */
@@ -286,16 +291,20 @@ html, body {
   50%      { transform: translate3d(7%, 0, 0); }
 }
 .spotlight-drift {
-  position: absolute;
-  inset: -20% -20% auto -20%;
-  height: 70%;
+  /* Fixed + viewport units so the glow is the same wide soft aurora on
+     phone and desktop. (As an absolute child of the max-w-2xl hero it
+     was clipped to a ~672px column, reading as a phone-shaped band on
+     wide screens.) */
+  position: fixed;
+  inset: -8vh -10vw auto -10vw;
+  height: 55vh;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 55% 65% at 50% 50%,
-    rgba(212, 175, 55, 0.22),
-    transparent 70%
+    ellipse 45% 55% at 50% 42%,
+    rgba(212, 175, 55, 0.16),
+    transparent 72%
   );
-  filter: blur(48px);
+  filter: blur(55px);
   animation: spotlight-drift 22s ease-in-out infinite;
   z-index: 0;
 }
