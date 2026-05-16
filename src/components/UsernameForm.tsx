@@ -63,7 +63,7 @@ export function UsernameForm() {
         disabled={loading || !value}
         className="rounded-lg bg-gold px-4 py-3 font-semibold text-black transition hover:bg-gold-dim disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {loading ? "Scratching…" : "Reveal"}
+        {loading ? "Revealing…" : "Reveal"}
       </button>
       <p className="text-xs text-zinc-600">
         Enter two usernames (e.g. <code>alice, bob</code>) to see what you&apos;ve
