@@ -20,7 +20,7 @@ export default function HomePage() {
         <UsernameForm />
       </div>
       <p className="fade-rise-4 relative text-xs text-zinc-600">
-        Your username is public. We scrape your public /films page only.
+        We only read your public Letterboxd profile — nothing private.
       </p>
       <div className="fade-rise-5 relative border-t border-zinc-900 pt-6 text-sm">
         <p className="text-zinc-500">

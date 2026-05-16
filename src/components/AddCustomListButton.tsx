@@ -27,7 +27,7 @@ export function AddCustomListButton({ username }: { username: string }) {
     }
     setBusy(true);
     setError(null);
-    setStatus("Scraping the list — this may take 10-30 seconds…");
+    setStatus("Importing the list — this may take 10-30 seconds…");
     try {
       const res = await fetch("/api/custom-list/add", {
         method: "POST",
@@ -74,7 +74,7 @@ export function AddCustomListButton({ username }: { username: string }) {
           <div>
             <h2 className="text-lg font-bold">Add a Letterboxd list</h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Paste any public Letterboxd list URL — we&apos;ll scrape it and
+              Paste any public Letterboxd list URL — we&apos;ll import it and
               add it as a tab on your profile. Limit 10 custom lists, up to
               250 films each.
             </p>

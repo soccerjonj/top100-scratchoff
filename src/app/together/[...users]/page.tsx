@@ -115,7 +115,7 @@ export default async function TogetherPage({
                 {i > 0 && " · "}
                 {r.username}: {r.filmCount.toLocaleString()}
                 {!r.csvUploadedAt && (
-                  <span className="text-amber-500/70"> (page 1 only)</span>
+                  <span className="text-amber-500/70"> (recent only)</span>
                 )}
               </span>
             ))}

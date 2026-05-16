@@ -109,7 +109,7 @@ export default async function UserPage({
           </h1>
           <p className="truncate text-xs text-zinc-500 sm:text-sm">
             {user.filmCount.toLocaleString()} films watched
-            {hasCsv ? "" : " · page 1 only"}
+            {hasCsv ? "" : " · recent only"}
           </p>
         </div>
         <ShareButton username={username} initialList={sharableList} />
