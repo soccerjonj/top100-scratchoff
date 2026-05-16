@@ -78,6 +78,24 @@ export function PosterCard({
   // badge animation on initial mount when watched is already true.
   const [badgeToggled, setBadgeToggled] = useState(false);
 
+  // Overview is clamped by default so the dialog fits without
+  // scrolling; the user can opt into the full text (which then makes
+  // the body scrollable on demand). `overviewClamped` tracks whether
+  // the text is actually long enough to need the toggle.
+  const overviewRef = useRef<HTMLParagraphElement>(null);
+  const [overviewExpanded, setOverviewExpanded] = useState(false);
+  const [overviewClamped, setOverviewClamped] = useState(false);
+
+  useEffect(() => {
+    if (overviewExpanded) return;
+    const el = overviewRef.current;
+    if (!el) {
+      setOverviewClamped(false);
+      return;
+    }
+    setOverviewClamped(el.scrollHeight > el.clientHeight + 1);
+  }, [details, overviewExpanded]);
+
   useEffect(() => {
     if (!prevWatchedRef.current && effectiveWatched && !reduceMotion) {
       setCelebrate(true);
@@ -92,6 +110,7 @@ export function PosterCard({
     const d = dialogRef.current;
     if (!d) return;
     setOpenCount((n) => n + 1);
+    setOverviewExpanded(false);
     d.showModal();
     if (!details && entry.tmdbId && loadState === "idle") {
       setLoadState("loading");
@@ -351,7 +370,9 @@ export function PosterCard({
             </div>
           </div>
 
-          {/* BODY — scrollable */}
+          {/* BODY — clamped overview keeps the dialog fitting without a
+              scroll by default; expanding the overview lets the body
+              scroll on demand. */}
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4">
             <div className="flex flex-wrap items-center gap-2">
               <AnimatePresence mode="wait" initial={false}>
@@ -412,9 +433,26 @@ export function PosterCard({
             )}
 
             {details?.overview ? (
-              <p className="text-sm leading-relaxed text-zinc-300">
-                {details.overview}
-              </p>
+              <div>
+                <p
+                  ref={overviewRef}
+                  className={[
+                    "text-sm leading-relaxed text-zinc-300",
+                    overviewExpanded ? "" : "line-clamp-4 sm:line-clamp-6",
+                  ].join(" ")}
+                >
+                  {details.overview}
+                </p>
+                {(overviewClamped || overviewExpanded) && (
+                  <button
+                    type="button"
+                    onClick={() => setOverviewExpanded((v) => !v)}
+                    className="mt-1 text-xs font-medium text-gold/80 transition hover:text-gold"
+                  >
+                    {overviewExpanded ? "Show less" : "Read more"}
+                  </button>
+                )}
+              </div>
             ) : loadState === "loading" ? (
               <div className="space-y-2">
                 <div className="h-2.5 w-full animate-pulse rounded bg-zinc-800" />
