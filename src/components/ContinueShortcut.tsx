@@ -49,48 +49,40 @@ export function ContinueShortcut() {
   const hasPartner = lastPartner && lastPartner !== lastUser;
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-2 rounded-lg border border-gold/30 bg-gold/5 p-3 text-sm">
-      <div className="text-xs uppercase tracking-widest text-zinc-500">
+    <div className="flex w-full max-w-sm flex-col items-center gap-2.5">
+      <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-600">
         Welcome back
       </div>
-      {hasPartner ? (
-        <>
-          <button
-            type="button"
-            onClick={() =>
-              router.push(`/together/${lastUser}/${lastPartner}`)
-            }
-            className="continue-pulse rounded-md bg-gold px-4 py-3 text-left font-semibold text-black transition hover:bg-gold-dim"
-          >
-            Open with{" "}
-            <span className="font-bold">
-              {lastUser} × {lastPartner}
-            </span>{" "}
-            →
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push(`/u/${lastUser}`)}
-            className="rounded-md border border-gold px-4 py-2.5 text-left text-sm text-gold hover:bg-gold/10"
-          >
-            Or just view <span className="font-semibold">{lastUser}</span> →
-          </button>
-        </>
-      ) : (
+      <button
+        type="button"
+        onClick={() =>
+          hasPartner
+            ? router.push(`/together/${lastUser}/${lastPartner}`)
+            : router.push(`/u/${lastUser}`)
+        }
+        className="w-full rounded-lg bg-gold px-4 py-3 text-center font-semibold text-black transition hover:bg-gold-dim"
+      >
+        Continue as{" "}
+        <span className="font-bold">
+          {hasPartner ? `${lastUser} × ${lastPartner}` : lastUser}
+        </span>{" "}
+        →
+      </button>
+      {hasPartner && (
         <button
           type="button"
           onClick={() => router.push(`/u/${lastUser}`)}
-          className="continue-pulse rounded-md bg-gold px-4 py-3 text-left font-semibold text-black transition hover:bg-gold-dim"
+          className="text-sm text-zinc-500 underline-offset-2 transition hover:text-gold hover:underline"
         >
-          Continue as <span className="font-bold">{lastUser}</span> →
+          or just view {lastUser}
         </button>
       )}
       <button
         type="button"
         onClick={forget}
-        className="self-end text-[10px] text-zinc-600 hover:text-zinc-400"
+        className="text-[10px] uppercase tracking-wider text-zinc-700 transition hover:text-zinc-500"
       >
-        Forget me
+        Not you? Forget me
       </button>
     </div>
   );
