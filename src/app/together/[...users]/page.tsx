@@ -5,7 +5,9 @@ import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { TogetherSwitcher } from "@/components/TogetherSwitcher";
 import { TogetherShareButton } from "@/components/TogetherShareButton";
 import { RememberMe } from "@/components/RememberMe";
+import { RandomPickerButton } from "@/components/RandomPickerButton";
 import { getCustomListsForUser } from "@/lib/custom-list";
+import { LISTS } from "@/lib/lists";
 import type { CustomListRecord, ListId, UserRecord } from "@/types";
 import { effectiveWatchedSet } from "@/types";
 import type { Density } from "@/components/PosterGrid";
@@ -121,7 +123,23 @@ export default async function TogetherPage({
             ))}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
+          <RandomPickerButton
+            lists={[
+              ...Object.entries(LISTS).map(([id, l]) => ({
+                id,
+                title: l.title,
+                entries: l.entries,
+              })),
+              ...customLists.map((c) => ({
+                id: c.id,
+                title: c.title,
+                entries: c.entries,
+              })),
+            ]}
+            watchedSlugs={userWatched[0] ?? []}
+            extraWatchedSets={userWatched.slice(1)}
+          />
           <TogetherShareButton
             usernames={usernames}
             initialList={sharableList}

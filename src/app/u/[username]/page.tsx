@@ -6,7 +6,9 @@ import { LetterboxdNotFoundError } from "@/lib/letterboxd";
 import { ListSwitcher } from "@/components/ListSwitcher";
 import { RememberMe } from "@/components/RememberMe";
 import { ShareButton } from "@/components/ShareButton";
+import { RandomPickerButton } from "@/components/RandomPickerButton";
 import { getCustomListsForUser } from "@/lib/custom-list";
+import { LISTS } from "@/lib/lists";
 import { CsvUpload } from "@/components/CsvUpload";
 import { GroupPanel } from "@/components/GroupPanel";
 import type { ListId } from "@/types";
@@ -112,7 +114,24 @@ export default async function UserPage({
             {hasCsv ? "" : " · recent only"}
           </p>
         </div>
-        <ShareButton username={username} initialList={sharableList} />
+        <div className="flex shrink-0 items-center gap-2">
+          <RandomPickerButton
+            lists={[
+              ...Object.entries(LISTS).map(([id, l]) => ({
+                id,
+                title: l.title,
+                entries: l.entries,
+              })),
+              ...customLists.map((c) => ({
+                id: c.id,
+                title: c.title,
+                entries: c.entries,
+              })),
+            ]}
+            watchedSlugs={effectiveWatched}
+          />
+          <ShareButton username={username} initialList={sharableList} />
+        </div>
       </header>
 
       {!hasCsv && (
