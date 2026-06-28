@@ -125,7 +125,7 @@ export default async function TogetherSharePage({
   // Share-intent text
   const verb = mode === "both" ? "We've both watched" : "Between us we've watched";
   const text = encodeURIComponent(
-    `${verb} ${watched}/${total} (${pct}%) of the ${listMeta.title} on wellwatched.app 🎬✨`,
+    `${verb} ${watched}/${total} (${pct}%) of the ${listMeta.title} on wellwatched.app`,
   );
   const xUrl = `https://twitter.com/intent/tweet?text=${text}`;
   const threadsUrl = `https://www.threads.net/intent/post?text=${text}`;
