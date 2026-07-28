@@ -1,0 +1,40 @@
+name: Refresh Letterboxd Top 500
+
+on:
+  schedule:
+    # Every 7 days, Monday 04:00 UTC — matches the app's own cron timing convention.
+    - cron: "0 4 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Re-scrape Letterboxd Top 500
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: npm run build-lists -- --letterboxd
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- src/data/letterboxd-top-500.json; then
+            echo "No changes — list is unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/letterboxd-top-500.json
+          git commit -m "Refresh Letterboxd Top 500 list [automated]"
+          git push
