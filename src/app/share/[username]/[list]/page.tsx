@@ -71,7 +71,7 @@ export default async function SharePage({ params }: { params: Params }) {
   // the X/Threads share intents will accept (Twitter is fine with relative,
   // Threads requires absolute — both clients resolve when pasted).
   const text = encodeURIComponent(
-    `I've watched ${watched}/${total} (${pct}%) of the ${listMeta.title} on wellwatched.app 🎬✨`,
+    `I've watched ${watched}/${total} (${pct}%) of the ${listMeta.title} on wellwatched.app`,
   );
   const xUrl = `https://twitter.com/intent/tweet?text=${text}`;
   const threadsUrl = `https://www.threads.net/intent/post?text=${text}`;

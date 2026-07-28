@@ -219,7 +219,7 @@ export function RandomPickerButton({
         className="shrink-0 rounded-md border border-gold bg-gold/10 px-3 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20 sm:px-4"
         aria-label="Pick a random movie"
       >
-        🎲 Random
+        Random
       </button>
 
       <dialog
@@ -232,7 +232,7 @@ export function RandomPickerButton({
             {/* Header bar */}
             <div className="flex items-center justify-between border-b border-zinc-900 px-4 py-3">
               <div className="text-xs uppercase tracking-wider text-zinc-500">
-                {phase === "revealed" ? "Your movie 🎬" : "🎲 Random pick"}
+                {phase === "revealed" ? "Your movie" : "Random pick"}
               </div>
               <button
                 type="button"
@@ -394,7 +394,7 @@ function SetupBody({
         disabled={noneEligible}
         className="rounded-lg bg-gold px-4 py-3 text-base font-semibold text-black transition hover:bg-gold-dim disabled:cursor-not-allowed disabled:opacity-50"
       >
-        🎲 Pick a movie
+        Pick a movie
       </button>
     </div>
   );
@@ -522,7 +522,7 @@ function RevealBody({
           onClick={onRollAgain}
           className="rounded-md border border-gold px-3 py-2 text-center text-sm font-medium text-gold hover:bg-gold/10"
         >
-          🎲 Roll again
+          Roll again
         </button>
         <button
           type="button"
