@@ -25,7 +25,10 @@ jobs:
       - name: Re-scrape Letterboxd Top 500
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-        run: npm run build-lists -- --letterboxd
+        # Call tsx directly (skip the npm script's --env-file=.env.local —
+        # that file is gitignored and doesn't exist in CI; TMDB_API_KEY is
+        # already provided via env: above).
+        run: npx tsx scripts/build-lists.ts --letterboxd
 
       - name: Commit if changed
         run: |
